@@ -1,0 +1,5 @@
+{
+  "name": "HU Online Attendance System",
+  "description": "A secure, web-based smart attendance management platform for Haramaya University CS students featuring GPS geofencing and session tokens.",
+  "requestFramePermissions": ["geolocation"]
+}
