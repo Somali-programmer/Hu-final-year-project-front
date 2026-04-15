@@ -17,7 +17,7 @@ interface StudentDashboardProps {
 const StudentDashboard: React.FC<StudentDashboardProps> = ({ view = 'overview' }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { sessions, attendance, sections, enrollments, semesters, addAttendance } = useAppData();
+  const { sessions, attendance, sections, enrollments, semesters, addAttendance, centers } = useAppData();
   const [activeSessions, setActiveSessions] = useState<(ClassSession & { section?: Section })[]>([]);
   const [attendanceHistory, setAttendanceHistory] = useState<Attendance[]>([]);
   const [token, setToken] = useState('');
@@ -224,15 +224,23 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ view = 'overview' }
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="hu-card p-5 md:p-8 flex items-center gap-6"
+                className={cn("hu-card p-5 md:p-8 flex flex-col items-center justify-center text-center", i === 2 ? "col-span-2 md:col-span-1" : "")}
               >
-                <div className={cn("w-10 h-10 md:w-12 md:h-12 md:w-16 md:h-16 rounded-3xl flex items-center justify-center shadow-inner", stat.bg)}>
+                <div className={cn("w-10 h-10 md:w-12 md:h-12 md:w-16 md:h-16 rounded-3xl flex items-center justify-center shadow-inner shrink-0 mb-4", stat.bg)}>
                   <stat.icon className={cn("w-6 h-6 md:w-8 md:h-8", stat.color)} />
                 </div>
                 <div>
                   <p className="hu-label mb-1">{stat.label}</p>
                   <p className="text-2xl md:text-4xl font-serif font-bold text-hu-charcoal">{stat.value}</p>
                 </div>
+                {stat.label === 'Active Sessions' && (stat.value as number) > 0 && (
+                  <button 
+                    onClick={() => navigate('/student/schedule')}
+                    className="mt-6 w-full py-2 bg-hu-green text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-hu-blue transition-colors"
+                  >
+                    Join Now
+                  </button>
+                )}
               </motion.div>
             ))}
           </div>
@@ -284,7 +292,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ view = 'overview' }
           </div>
 
           {/* Quick Actions Grid */}
-          <section className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-8">
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
             {[
               { title: 'My Attendance', desc: 'View your detailed attendance history.', icon: CheckCircle2, color: 'text-hu-blue', bg: 'bg-hu-blue/5', path: '/student/attendance' },
               { title: 'Class Schedule', desc: 'View upcoming classes and active sessions.', icon: Calendar, color: 'text-hu-green', bg: 'bg-hu-green/5', path: '/student/schedule' }
@@ -335,7 +343,9 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ view = 'overview' }
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
                       <h3 className="text-lg md:text-xl font-serif font-bold text-black">{session.section?.courseId}</h3>
-                      <p className="text-sm text-gray-400 font-medium">Section {session.section?.sectionId}</p>
+                      <p className="text-sm text-gray-400 font-medium">
+                        Section {session.section?.sectionId} • {centers.find(c => c.centerId === session.section?.center)?.name || session.section?.center}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2 text-hu-green">
                       <MapPin className="w-4 h-4" />
@@ -345,19 +355,19 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ view = 'overview' }
 
                   <div className="space-y-4">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Session Code</label>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col md:flex-row gap-4">
                       <input 
                         type="text" 
                         maxLength={6}
                         value={token}
                         onChange={(e) => setToken(e.target.value.toUpperCase())}
                         placeholder="ENTER CODE"
-                        className="flex-1 bg-hu-cream/30 border-none rounded-2xl px-6 py-4 text-lg font-mono font-bold tracking-[0.5em] focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all placeholder:tracking-normal placeholder:text-xs placeholder:font-sans"
+                        className="w-full md:flex-1 bg-hu-cream/30 border-none rounded-2xl px-6 py-4 text-lg font-mono font-bold tracking-[0.5em] focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all placeholder:tracking-normal placeholder:text-xs placeholder:font-sans"
                       />
                       <button 
                         onClick={() => handleMarkAttendance(session)}
                         disabled={loading || !token}
-                        className="hu-button-rounded px-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="hu-button-rounded w-full md:w-auto px-8 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                       >
                         {loading ? '...' : 'Mark Presence'}
                       </button>

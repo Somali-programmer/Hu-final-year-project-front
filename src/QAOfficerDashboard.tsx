@@ -93,9 +93,9 @@ const QAOfficerDashboard: React.FC<QAOfficerDashboardProps> = ({ view = 'overvie
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="hu-card-alt p-5 md:p-8 border-none"
+                className={cn("hu-card-alt p-5 md:p-8 border-none flex flex-col items-center justify-center text-center", i === 2 ? "col-span-2 md:col-span-1" : "")}
               >
-                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-inner", stat.bg, stat.color)}>
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-4 shadow-inner", stat.bg, stat.color)}>
                   <stat.icon className="w-7 h-7" />
                 </div>
                 <p className="hu-label mb-1">{stat.label}</p>
@@ -151,7 +151,7 @@ const QAOfficerDashboard: React.FC<QAOfficerDashboardProps> = ({ view = 'overvie
           </div>
 
           {/* Quick Actions Grid */}
-          <section className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
             {[
               { title: 'Audit Logs', desc: 'Review system compliance and attendance logs.', icon: ShieldCheck, color: 'text-blue-500', bg: 'bg-blue-50', path: '/qa/audit' },
               { title: 'Corrections', desc: 'Review and approve attendance correction requests.', icon: ClipboardCheck, color: 'text-purple-500', bg: 'bg-purple-50', path: '/qa/corrections' },

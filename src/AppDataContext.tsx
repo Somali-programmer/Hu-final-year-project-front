@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { User, Course, Section, ClassSession, Attendance, Semester, Enrollment } from './types';
-import { MOCK_USERS, MOCK_COURSES, MOCK_SECTIONS, MOCK_SESSIONS, MOCK_ATTENDANCE, MOCK_SEMESTERS, MOCK_ENROLLMENTS } from './mockData';
+import { User, Course, Section, ClassSession, Attendance, Semester, Enrollment, AuditLog, ProgramType, Center, CenterInfo } from './types';
+import { MOCK_USERS, MOCK_COURSES, MOCK_SECTIONS, MOCK_SESSIONS, MOCK_ATTENDANCE, MOCK_SEMESTERS, MOCK_ENROLLMENTS, MOCK_CENTERS } from './mockData';
 
 interface AppDataContextType {
   users: User[];
@@ -10,6 +10,8 @@ interface AppDataContextType {
   attendance: Attendance[];
   semesters: Semester[];
   enrollments: Enrollment[];
+  auditLogs: AuditLog[];
+  centers: CenterInfo[];
   
   // Actions
   addSection: (section: Section) => void;
@@ -26,6 +28,11 @@ interface AppDataContextType {
   addAttendance: (record: Attendance) => void;
   addSession: (session: ClassSession) => void;
   updateSession: (sessionId: string, updates: Partial<ClassSession>) => void;
+  addEnrollment: (enrollment: Enrollment) => void;
+  addAuditLog: (log: Omit<AuditLog, 'logId' | 'timestamp'>) => void;
+  addCenter: (center: CenterInfo) => void;
+  updateCenter: (centerId: string, updates: Partial<CenterInfo>) => void;
+  deleteCenter: (centerId: string) => void;
 }
 
 const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
@@ -38,13 +45,66 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [attendance, setAttendance] = useState<Attendance[]>(MOCK_ATTENDANCE);
   const [semesters, setSemesters] = useState<Semester[]>(MOCK_SEMESTERS);
   const [enrollments, setEnrollments] = useState<Enrollment[]>(MOCK_ENROLLMENTS);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [centers, setCenters] = useState<CenterInfo[]>(MOCK_CENTERS);
+
+  const addAuditLog = (log: Omit<AuditLog, 'logId' | 'timestamp'>) => {
+    const newLog: AuditLog = {
+      ...log,
+      logId: `log-${Date.now()}`,
+      timestamp: new Date().toISOString()
+    };
+    setAuditLogs(prev => [newLog, ...prev]);
+  };
 
   const addSection = (section: Section) => {
     setSections(prev => [...prev, section]);
+    
+    // Auto-enroll matching students
+    const matchingStudents = users.filter(u => 
+      u.role === 'student' && 
+      u.programType?.toLowerCase() === section.programType?.toLowerCase() && 
+      u.center?.toLowerCase() === section.center?.toLowerCase()
+    );
+
+    if (matchingStudents.length > 0) {
+      const newEnrollments: Enrollment[] = matchingStudents.map(student => ({
+        enrollmentId: `enr-${Date.now()}-${section.sectionId}-${student.userId}`,
+        studentId: student.userId,
+        sectionId: section.sectionId,
+        enrolledAt: new Date().toISOString()
+      }));
+      setEnrollments(prev => [...prev, ...newEnrollments]);
+    }
   };
 
   const updateSection = (sectionId: string, updates: Partial<Section>) => {
-    setSections(prev => prev.map(s => s.sectionId === sectionId ? { ...s, ...updates } : s));
+    setSections(prev => {
+      const newSections = prev.map(s => s.sectionId === sectionId ? { ...s, ...updates } : s);
+      const updatedSection = newSections.find(s => s.sectionId === sectionId);
+      
+      if (updatedSection && (updates.programType || updates.center)) {
+        const matchingStudents = users.filter(u => 
+          u.role === 'student' && 
+          u.programType?.toLowerCase() === updatedSection.programType?.toLowerCase() && 
+          u.center?.toLowerCase() === updatedSection.center?.toLowerCase()
+        );
+
+        const newEnrollments: Enrollment[] = matchingStudents.map(student => ({
+          enrollmentId: `enr-${Date.now()}-${sectionId}-${student.userId}`,
+          studentId: student.userId,
+          sectionId: sectionId,
+          enrolledAt: new Date().toISOString()
+        }));
+
+        setEnrollments(prev => {
+          const filtered = prev.filter(e => e.sectionId !== sectionId);
+          return [...filtered, ...newEnrollments];
+        });
+      }
+      
+      return newSections;
+    });
   };
 
   const deleteSection = (sectionId: string) => {
@@ -62,7 +122,27 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
     })));
   };
 
-  const addUser = (user: User) => setUsers(prev => [user, ...prev]);
+  const addUser = (user: User) => {
+    setUsers(prev => [user, ...prev]);
+    
+    // If student, auto-enroll in matching sections
+    if (user.role === 'student') {
+      const matchingSections = sections.filter(s => 
+        s.programType?.toLowerCase() === user.programType?.toLowerCase() && 
+        s.center?.toLowerCase() === user.center?.toLowerCase()
+      );
+
+      if (matchingSections.length > 0) {
+        const newEnrollments: Enrollment[] = matchingSections.map(section => ({
+          enrollmentId: `enr-${Date.now()}-${section.sectionId}-${user.userId}`,
+          studentId: user.userId,
+          sectionId: section.sectionId,
+          enrolledAt: new Date().toISOString()
+        }));
+        setEnrollments(prev => [...prev, ...newEnrollments]);
+      }
+    }
+  };
   const updateUser = (userId: string, updates: Partial<User>) => setUsers(prev => prev.map(u => u.userId === userId ? { ...u, ...updates } : u));
   const deleteUser = (userId: string) => setUsers(prev => prev.filter(u => u.userId !== userId));
   
@@ -82,12 +162,29 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
     setSessions(prev => prev.map(s => s.sessionId === sessionId ? { ...s, ...updates } : s));
   };
 
+  const addEnrollment = (enrollment: Enrollment) => {
+    setEnrollments(prev => [...prev, enrollment]);
+  };
+
+  const addCenter = (center: CenterInfo) => {
+    setCenters(prev => [...prev, center]);
+  };
+
+  const updateCenter = (centerId: string, updates: Partial<CenterInfo>) => {
+    setCenters(prev => prev.map(c => c.centerId === centerId ? { ...c, ...updates } : c));
+  };
+
+  const deleteCenter = (centerId: string) => {
+    setCenters(prev => prev.filter(c => c.centerId !== centerId));
+  };
+
   return (
     <AppDataContext.Provider value={{
-      users, courses, sections, sessions, attendance, semesters, enrollments,
+      users, courses, sections, sessions, attendance, semesters, enrollments, auditLogs, centers,
       addSection, updateSection, deleteSection, addSemester, setActiveSemester,
       addUser, updateUser, deleteUser, addCourse, updateCourse, deleteCourse,
-      addAttendance, addSession, updateSession
+      addAttendance, addSession, updateSession, addEnrollment, addAuditLog,
+      addCenter, updateCenter, deleteCenter
     }}>
       {children}
     </AppDataContext.Provider>

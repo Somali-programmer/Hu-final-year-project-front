@@ -4,6 +4,23 @@
  */
 
 export type UserRole = 'student' | 'instructor' | 'admin' | 'qa';
+export type ProgramType = 'regular' | 'extension';
+export type Center = string;
+export type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+
+export interface CenterInfo {
+  centerId: string;
+  name: string;
+  location?: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface ScheduleBlock {
+  dayOfWeek: DayOfWeek;
+  startTime: string;
+  endTime: string;
+}
 
 export interface User {
   userId: string;
@@ -15,6 +32,9 @@ export interface User {
   phone?: string;
   createdAt: string;
   isActive: boolean;
+  programType?: ProgramType;
+  center?: Center;
+  batch?: string;
 }
 
 export interface Course {
@@ -46,7 +66,14 @@ export interface Section {
   instructorId: string;
   semesterId: string;
   room: string;
-  schedule: string;
+  programType: ProgramType;
+  center: Center;
+  startDate: string;
+  endDate: string;
+  schedule: ScheduleBlock[];
+  meetingDates?: string[]; // Specific dates for extension/weekend programs
+  midExamDates?: string[];
+  finalExamDates?: string[];
   geofenceCenter: {
     latitude: number;
     longitude: number;
@@ -75,4 +102,15 @@ export interface Attendance {
     longitude: number;
   };
   distanceFromCenter: number;
+}
+
+export interface AuditLog {
+  logId: string;
+  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  entityType: 'USER' | 'COURSE' | 'SECTION' | 'SEMESTER' | 'CENTER';
+  entityId: string;
+  entityName: string;
+  performedBy: string;
+  timestamp: string;
+  details?: string;
 }

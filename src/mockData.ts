@@ -1,4 +1,28 @@
-import { User, Course, Section, ClassSession, Attendance, Semester, Enrollment } from './types';
+import { User, Course, Section, ClassSession, Attendance, Semester, Enrollment, CenterInfo } from './types';
+
+export const MOCK_CENTERS: CenterInfo[] = [
+  {
+    centerId: 'main',
+    name: 'Main Campus',
+    location: 'Haramaya',
+    description: 'The primary university campus.',
+    createdAt: new Date().toISOString()
+  },
+  {
+    centerId: 'jigjiga',
+    name: 'Jigjiga Center',
+    location: 'Jigjiga',
+    description: 'Extension center located in Jigjiga.',
+    createdAt: new Date().toISOString()
+  },
+  {
+    centerId: 'harer',
+    name: 'Harer Center',
+    location: 'Harer',
+    description: 'Extension center located in Harer.',
+    createdAt: new Date().toISOString()
+  }
+];
 
 export const MOCK_USERS: User[] = [
   // Instructors
@@ -13,9 +37,9 @@ export const MOCK_USERS: User[] = [
   },
   {
     userId: 'inst-2',
-    email: 'Alemu.G@haramaya.edu.et',
+    email: 'wabi.j@haramaya.edu.et',
     role: 'instructor',
-    fullName: 'Alemu gudeta.',
+    fullName: 'Wabi J.',
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
@@ -40,9 +64,9 @@ export const MOCK_USERS: User[] = [
   },
   {
     userId: 'inst-5',
-    email: 'Wabi.J@haramaya.edu.et',
+    email: 'abebe.k@haramaya.edu.et',
     role: 'instructor',
-    fullName: 'Wabi J',
+    fullName: 'Dr. Abebe Kebede',
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
@@ -57,6 +81,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'regular',
+    center: 'main',
   },
   {
     userId: 'std-2',
@@ -67,6 +93,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'regular',
+    center: 'main',
   },
   {
     userId: 'std-3',
@@ -77,6 +105,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'extension',
+    center: 'jigjiga',
   },
   {
     userId: 'std-4',
@@ -87,6 +117,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'extension',
+    center: 'jigjiga',
   },
   {
     userId: 'std-5',
@@ -97,16 +129,20 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'regular',
+    center: 'main',
   },
   {
     userId: 'std-6',
-    idNumber: '0318/15',
+    idNumber: '0331/15',
     email: 'mawlid.mahamed@haramaya.edu.et',
     role: 'student',
     fullName: 'Mawlid Mahamed Abdi',
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'regular',
+    center: 'main',
   },
   {
     userId: 'std-7',
@@ -117,6 +153,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'regular',
+    center: 'main',
   },
   {
     userId: 'std-8',
@@ -127,6 +165,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'extension',
+    center: 'harer',
   },
   {
     userId: 'std-9',
@@ -137,6 +177,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'extension',
+    center: 'harer',
   },
   {
     userId: 'std-10',
@@ -147,6 +189,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
+    programType: 'regular',
+    center: 'main',
   },
   // Admin & QA
   {
@@ -268,7 +312,14 @@ export const MOCK_SECTIONS: Section[] = [
     instructorId: 'inst-1',
     semesterId: 'sem-1',
     room: 'Block 24, Room 102',
-    schedule: 'Mon, Wed • 08:30 AM',
+    programType: 'regular',
+    center: 'main',
+    startDate: '2026-09-01',
+    endDate: '2027-01-15',
+    schedule: [
+      { dayOfWeek: 'Monday', startTime: '08:30', endTime: '10:30' },
+      { dayOfWeek: 'Wednesday', startTime: '08:30', endTime: '10:30' }
+    ],
     geofenceCenter: { latitude: 9.412, longitude: 42.035 },
     geofenceRadius: 50,
   },
@@ -278,9 +329,18 @@ export const MOCK_SECTIONS: Section[] = [
     instructorId: 'inst-2',
     semesterId: 'sem-1',
     room: 'Block 24, Room 205',
-    schedule: 'Tue, Thu • 10:00 AM',
-    geofenceCenter: { latitude: 9.412, longitude: 42.035 },
-    geofenceRadius: 50,
+    programType: 'extension',
+    center: 'jigjiga',
+    startDate: '2026-09-01',
+    endDate: '2027-01-15',
+    schedule: [
+      { dayOfWeek: 'Saturday', startTime: '08:00', endTime: '10:00' },
+      { dayOfWeek: 'Saturday', startTime: '10:30', endTime: '12:30' },
+      { dayOfWeek: 'Sunday', startTime: '08:00', endTime: '10:00' },
+      { dayOfWeek: 'Sunday', startTime: '10:30', endTime: '12:30' }
+    ],
+    geofenceCenter: { latitude: 9.350, longitude: 42.798 },
+    geofenceRadius: 100,
   },
   {
     sectionId: 'section-3',
@@ -288,20 +348,32 @@ export const MOCK_SECTIONS: Section[] = [
     instructorId: 'inst-3',
     semesterId: 'sem-1',
     room: 'Block 24, Room 301',
-    schedule: 'Fri • 02:00 PM',
+    programType: 'regular',
+    center: 'main',
+    startDate: '2026-09-01',
+    endDate: '2027-01-15',
+    schedule: [
+      { dayOfWeek: 'Friday', startTime: '14:00', endTime: '16:00' }
+    ],
     geofenceCenter: { latitude: 9.412, longitude: 42.035 },
     geofenceRadius: 50,
   },
 ];
 
 export const MOCK_ENROLLMENTS: Enrollment[] = [
+  // Section 1 (Regular, Main)
   { enrollmentId: 'enr-1', studentId: 'std-1', sectionId: 'section-1', enrolledAt: new Date().toISOString() },
   { enrollmentId: 'enr-2', studentId: 'std-2', sectionId: 'section-1', enrolledAt: new Date().toISOString() },
-  { enrollmentId: 'enr-3', studentId: 'std-3', sectionId: 'section-1', enrolledAt: new Date().toISOString() },
-  { enrollmentId: 'enr-4', studentId: 'std-4', sectionId: 'section-1', enrolledAt: new Date().toISOString() },
-  { enrollmentId: 'enr-5', studentId: 'std-5', sectionId: 'section-1', enrolledAt: new Date().toISOString() },
-  { enrollmentId: 'enr-6', studentId: 'std-1', sectionId: 'section-2', enrolledAt: new Date().toISOString() },
-  { enrollmentId: 'enr-7', studentId: 'std-2', sectionId: 'section-2', enrolledAt: new Date().toISOString() },
+  { enrollmentId: 'enr-3', studentId: 'std-5', sectionId: 'section-1', enrolledAt: new Date().toISOString() },
+  { enrollmentId: 'enr-4', studentId: 'std-6', sectionId: 'section-1', enrolledAt: new Date().toISOString() },
+  
+  // Section 2 (Extension, Jigjiga)
+  { enrollmentId: 'enr-5', studentId: 'std-3', sectionId: 'section-2', enrolledAt: new Date().toISOString() },
+  { enrollmentId: 'enr-6', studentId: 'std-4', sectionId: 'section-2', enrolledAt: new Date().toISOString() },
+  
+  // Section 3 (Regular, Main)
+  { enrollmentId: 'enr-7', studentId: 'std-1', sectionId: 'section-3', enrolledAt: new Date().toISOString() },
+  { enrollmentId: 'enr-8', studentId: 'std-2', sectionId: 'section-3', enrolledAt: new Date().toISOString() },
 ];
 
 export const MOCK_SESSIONS: ClassSession[] = [

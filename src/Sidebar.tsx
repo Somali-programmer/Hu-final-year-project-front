@@ -20,7 +20,8 @@ import {
   ClipboardCheck,
   CheckCircle2,
   Calendar,
-  Clock
+  Clock,
+  MapPin
 } from 'lucide-react';
 import { cn } from './lib/utils';
 
@@ -37,6 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     { name: 'Staff', path: '/admin/staff', icon: Briefcase, roles: ['admin'] },
     { name: 'Students', path: '/admin/students', icon: GraduationCap, roles: ['admin'] },
     { name: 'Courses', path: '/admin/courses', icon: BookOpen, roles: ['admin'] },
+    { name: 'Centers', path: '/admin/centers', icon: MapPin, roles: ['admin'] },
     { name: 'Settings', path: '/settings', icon: Settings, roles: ['admin'] },
     // Instructor
     { name: 'Live Sessions', path: '/instructor/sessions', icon: Play, roles: ['instructor'] },

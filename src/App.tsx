@@ -75,8 +75,10 @@ export default function App() {
               <Route path="/admin/staff" element={<ProtectedRoute><Layout><AdminDashboard view="staff" /></Layout></ProtectedRoute>} />
               <Route path="/admin/students" element={<ProtectedRoute><Layout><AdminDashboard view="students" /></Layout></ProtectedRoute>} />
               <Route path="/admin/courses" element={<ProtectedRoute><Layout><AdminDashboard view="courses" /></Layout></ProtectedRoute>} />
+              <Route path="/admin/centers" element={<ProtectedRoute><Layout><AdminDashboard view="centers" /></Layout></ProtectedRoute>} />
               <Route path="/admin/sections" element={<ProtectedRoute><Layout><AdminDashboard view="sections" /></Layout></ProtectedRoute>} />
               <Route path="/admin/semesters" element={<ProtectedRoute><Layout><AdminDashboard view="semesters" /></Layout></ProtectedRoute>} />
+              <Route path="/admin/audit" element={<ProtectedRoute><Layout><AdminDashboard view="audit" /></Layout></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Layout><AdminDashboard view="settings" /></Layout></ProtectedRoute>} />
               
               {/* Instructor Routes */}
