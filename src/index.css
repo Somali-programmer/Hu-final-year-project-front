@@ -13,80 +13,139 @@
   --color-hu-cream: #FDFBF7;
   --color-hu-charcoal: #1A1A1A;
 
-  /* Legacy support for existing components */
-  --color-hu-white: #fcfcfc;
-  --color-gray-black: #333333;
+  /* Semantic Theme Variables */
+  --color-brand-primary: var(--primary);
+  --color-brand-primary-light: var(--primary-light);
+  --color-brand-surface: var(--surface);
+  --color-brand-bg: var(--bg);
+  --color-brand-text: var(--text-main);
+  --color-brand-muted: var(--text-dim);
+  --color-brand-border: var(--border-subtle);
 
-  /* HU Elevation Scale - Using LimeGreen #32CD32 for shadows */
-  --shadow-hu-elevate-1: 0 2px 4px rgba(50, 205, 50, 0.1), 0 1px 2px rgba(50, 205, 50, 0.05);
-  --shadow-hu-elevate-2: 0 10px 15px -3px rgba(50, 205, 50, 0.15), 0 4px 6px -2px rgba(50, 205, 50, 0.08);
-  --shadow-hu-elevate-3: 0 20px 25px -5px rgba(50, 205, 50, 0.2), 0 10px 10px -5px rgba(50, 205, 50, 0.1);
-  --shadow-hu-elevate-4: 0 25px 50px -12px rgba(50, 205, 50, 0.25);
+  /* Elevation Scale - Using Primary color for shadows */
+  --shadow-hu-elevate-1: 0 2px 4px var(--primary-shadow-low);
+  --shadow-hu-elevate-2: 0 10px 15px -3px var(--primary-shadow-med);
+  --shadow-hu-elevate-3: 0 20px 25px -5px var(--primary-shadow-high);
+}
+
+/* Enable class-based dark mode for dark: variants */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --primary: #32CD32;
+  --primary-light: rgba(50, 205, 50, 0.1);
+  --primary-shadow-low: rgba(50, 205, 50, 0.1);
+  --primary-shadow-med: rgba(50, 205, 50, 0.15);
+  --primary-shadow-high: rgba(50, 205, 50, 0.2);
+  --surface: #FFFFFF;
+  --bg: #fcfcfc;
+  --text-main: #1A1A1A;
+  --text-dim: #6B7280;
+  --border-subtle: #F3F4F6;
+  
+  /* Green and HU Blue Cards Stroke */
+  --card-stroke: var(--border-subtle);
+  --card-stroke-hover: #32CD32; /* HU Green Stroke on Hover */
+  --card-shadow: var(--shadow-hu-elevate-2);
+  --card-shadow-hover: 0 20px 25px -5px rgba(50, 205, 50, 0.15), 0 8px 10px -6px rgba(0, 86, 150, 0.1); /* Lift with Green & Blue hints */
+}
+
+.dark {
+  --primary: #FFB81C;
+  --primary-light: rgba(255, 184, 28, 0.1);
+  --primary-shadow-low: rgba(0, 0, 0, 0.3);
+  --primary-shadow-med: rgba(0, 0, 0, 0.4);
+  --primary-shadow-high: rgba(0, 0, 0, 0.5);
+  --surface: #1E1E1E;
+  --bg: #121212;
+  --text-main: #FDFBF7;
+  --text-dim: #9CA3AF;
+  --border-subtle: #2D2D2D;
+
+  /* Red Cards Stroke & Gold Sunshine Shadow */
+  --card-stroke: var(--border-subtle);
+  --card-stroke-hover: #EF4444; /* Red Stroke Hover */
+  --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 4px 10px -3px rgba(0, 0, 0, 0.8); /* Visible deep shadow at rest */
+  --card-shadow-hover: 0 25px 45px -10px rgba(255, 184, 28, 0.35), 0 0 25px rgba(255, 184, 28, 0.15); /* sunshine gold shadow */
 }
 
 @layer components {
   /* HU Localized Design System */
   .hu-card {
-    @apply bg-white border border-gray-100 rounded-[24px] shadow-hu-elevate-2 transition-all duration-300 hover:shadow-hu-elevate-3;
+    border: 1px solid var(--card-stroke);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+    @apply bg-brand-surface rounded-[24px];
+  }
+
+  .hu-card:hover {
+    border-color: var(--card-stroke-hover) !important;
+    box-shadow: var(--card-shadow-hover) !important;
+    transform: translateY(-6px) !important;
   }
 
   .hu-card-alt {
-    @apply bg-white border border-gray-100 rounded-[20px] md:rounded-[32px] shadow-[0_8px_30px_rgba(50,205,50,0.1)] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(50,205,50,0.2)];
+    border: 1px solid var(--card-stroke);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+    @apply bg-brand-surface rounded-[20px] md:rounded-[32px];
+  }
+
+  .hu-card-alt:hover {
+    border-color: var(--card-stroke-hover) !important;
+    box-shadow: var(--card-shadow-hover) !important;
+    transform: translateY(-6px) !important;
   }
 
   .hu-button {
-    @apply px-6 py-3 bg-hu-green text-white rounded-xl font-bold transition-all duration-300 hover:bg-hu-blue hover:shadow-hu-elevate-2 active:scale-[0.98] flex items-center justify-center gap-2;
-  }
-
-  .hu-button-gold {
-    @apply px-6 py-3 bg-hu-gold text-hu-charcoal rounded-xl font-bold transition-all duration-300 hover:brightness-110 hover:shadow-hu-elevate-2 active:scale-[0.98] flex items-center justify-center gap-2;
+    @apply px-6 py-3 bg-brand-primary text-black dark:text-hu-charcoal rounded-xl font-bold transition-all duration-300 hover:brightness-110 hover:shadow-hu-elevate-2 active:scale-[0.98] flex items-center justify-center gap-2;
   }
 
   .hu-button-rounded {
-    @apply px-6 py-3 md:px-8 md:py-4 text-sm md:text-base bg-hu-green text-white rounded-full font-bold transition-all duration-300 hover:bg-hu-blue hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-hu-green/20;
+    @apply px-6 py-3 md:px-8 md:py-4 text-sm md:text-base bg-brand-primary text-black dark:text-hu-charcoal rounded-full font-bold transition-all duration-300 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-brand-primary/20;
   }
 
   .hu-glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-hu-elevate-1;
+    @apply bg-brand-surface/70 backdrop-blur-md border border-brand-border shadow-hu-elevate-1;
   }
 
   .hu-input {
-    @apply w-full px-5 py-3 bg-hu-cream border border-gray-200 rounded-xl focus:bg-white focus:border-hu-green focus:ring-2 focus:ring-hu-green/10 outline-none transition-all duration-200;
-  }
-
-  .hu-input-rounded {
-    @apply w-full px-4 py-3 md:px-6 md:py-4 text-sm md:text-base bg-hu-cream/50 border border-transparent rounded-xl md:rounded-2xl focus:bg-white focus:border-hu-gold focus:ring-0 outline-none transition-all duration-300;
+    @apply w-full px-5 py-3 bg-brand-bg border border-brand-border rounded-xl text-brand-text focus:bg-brand-surface focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 outline-none transition-all duration-200;
   }
 
   .hu-label {
-    @apply text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-bold text-hu-charcoal mb-1 md:mb-2 block opacity-70;
+    @apply text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-bold text-brand-text mb-1 md:mb-2 block opacity-70;
   }
 
   .hu-gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-hu-green to-hu-gold;
   }
-
-  /* Elevation Utilities */
-  .hu-elevate-1 { @apply shadow-hu-elevate-1; }
-  .hu-elevate-2 { @apply shadow-hu-elevate-2; }
-  .hu-elevate-3 { @apply shadow-hu-elevate-3; }
-  .hu-elevate-4 { @apply shadow-hu-elevate-4; }
 }
 
 @layer base {
   body {
-    @apply font-sans bg-hu-white text-gray-900 antialiased text-[14px] md:text-[16px];
+    @apply font-sans bg-brand-bg text-brand-text antialiased text-[14px] md:text-[16px] transition-colors duration-500;
   }
   
-  h1 {
-    @apply font-serif text-2xl md:text-5xl lg:text-6xl text-black;
+  h1, h2, h3 {
+    @apply font-serif text-brand-text;
   }
+  
+  h1 { @apply text-2xl md:text-5xl lg:text-6xl; }
+  h2 { @apply text-xl md:text-4xl; }
+  h3 { @apply text-lg md:text-2xl; }
 
-  h2 {
-    @apply font-serif text-xl md:text-4xl text-black;
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
-
-  h3 {
-    @apply font-serif text-lg md:text-2xl text-black;
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-brand-border rounded-full;
   }
 }

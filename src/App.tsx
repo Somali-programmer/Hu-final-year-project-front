@@ -16,8 +16,8 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-10 h-10 md:w-12 md:h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-brand-bg">
+        <div className="w-10 h-10 md:w-12 md:h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -75,6 +75,8 @@ export default function App() {
               <Route path="/admin/staff" element={<ProtectedRoute><Layout><AdminDashboard view="staff" /></Layout></ProtectedRoute>} />
               <Route path="/admin/students" element={<ProtectedRoute><Layout><AdminDashboard view="students" /></Layout></ProtectedRoute>} />
               <Route path="/admin/courses" element={<ProtectedRoute><Layout><AdminDashboard view="courses" /></Layout></ProtectedRoute>} />
+              <Route path="/admin/programs" element={<ProtectedRoute><Layout><AdminDashboard view="programs" /></Layout></ProtectedRoute>} />
+              <Route path="/admin/batches" element={<ProtectedRoute><Layout><AdminDashboard view="batches" /></Layout></ProtectedRoute>} />
               <Route path="/admin/centers" element={<ProtectedRoute><Layout><AdminDashboard view="centers" /></Layout></ProtectedRoute>} />
               <Route path="/admin/sections" element={<ProtectedRoute><Layout><AdminDashboard view="sections" /></Layout></ProtectedRoute>} />
               <Route path="/admin/semesters" element={<ProtectedRoute><Layout><AdminDashboard view="semesters" /></Layout></ProtectedRoute>} />

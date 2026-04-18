@@ -49,7 +49,7 @@ interface InstructorDashboardProps {
 const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overview' }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { sections: allSections, semesters, courses, updateSection, enrollments, users, sessions, addSession, updateSession, attendance, centers } = useAppData();
+  const { sections: allSections, semesters, courses, updateSection, enrollments, users, sessions, addSession, updateSession, attendance, centers, programs } = useAppData();
   const [sections, setSections] = useState<Section[]>([]);
   const [activeSession, setActiveSession] = useState<ClassSession | null>(null);
   const [liveAttendance, setLiveAttendance] = useState<(Attendance & { student?: User })[]>([]);
@@ -225,8 +225,9 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
       const token = generateSessionToken();
       
       // Dynamic policy based on program type
-      const tokenExpiryMinutes = section.programType === 'extension' ? 30 : 15;
-      const sessionDurationMinutes = section.programType === 'extension' ? 180 : 90;
+      const isExtension = programs.find(p => p.programId === section.programType)?.name.toLowerCase() === 'extension';
+      const tokenExpiryMinutes = isExtension ? 30 : 15;
+      const sessionDurationMinutes = isExtension ? 180 : 90;
 
       const expiry = addMinutes(new Date(), tokenExpiryMinutes).toISOString();
       const sessionEnd = addMinutes(new Date(), sessionDurationMinutes).toISOString();
@@ -360,12 +361,12 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
   const COLORS = ['#000000', '#D4AF37', '#000000', '#D4AF37', '#000000'];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 md:space-y-12">
+    <div className="w-full space-y-6 md:space-y-10">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start gap-4 md:gap-8">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4 md:gap-6">
         <div className="text-left">
           <p className="hu-label">Instructor Portal</p>
-          <h1 className="text-3xl md:text-5xl font-serif font-bold text-black tracking-tight">
+          <h1 className="text-2xl md:text-4xl font-serif font-bold text-brand-text tracking-tight">
             Class <span className="text-gray-black/40 italic">Management</span>
           </h1>
         </div>
@@ -378,30 +379,30 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
       {view === 'overview' && (
         <>
           {/* Overview Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {(() => {
               const instructorSectionIds = sections.map(s => s.sectionId);
               const instructorEnrollments = enrollments.filter(e => instructorSectionIds.includes(e.sectionId));
               const uniqueStudents = new Set(instructorEnrollments.map(e => e.studentId)).size;
               
               return [
-                { label: 'Total Students', value: uniqueStudents.toString(), icon: Users, color: 'text-hu-green', bg: 'bg-hu-green/10' },
+                { label: 'Total Students', value: uniqueStudents.toString(), icon: Users, color: 'text-brand-primary', bg: 'bg-brand-primary/10' },
                 { label: 'Avg. Attendance', value: '92%', icon: BarChart3, color: 'text-hu-gold', bg: 'bg-hu-gold/10' },
-                { label: 'Active Sections', value: sections.length, icon: CalendarDays, color: 'text-black', bg: 'bg-gray-100' }
+                { label: 'Active Sections', value: sections.length, icon: CalendarDays, color: 'text-brand-text', bg: 'bg-gray-100' }
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className={cn("hu-card-alt p-5 md:p-8 flex flex-col items-center justify-center text-center", i === 2 ? "col-span-2 md:col-span-1" : "")}
+                  className={cn("hu-card-alt p-4 md:p-6 flex flex-col items-center justify-center text-center", i === 2 ? "col-span-2 md:col-span-1" : "")}
                 >
-                  <div className={cn("w-10 h-10 md:w-12 md:h-12 md:w-16 md:h-16 rounded-3xl flex items-center justify-center shadow-inner mb-4", stat.bg)}>
-                    <stat.icon className={cn("w-6 h-6 md:w-8 md:h-8", stat.color)} />
+                  <div className={cn("w-10 h-10 md:w-12 md:h-12 flex items-center justify-center shadow-inner mb-4 rounded-xl", stat.bg)}>
+                    <stat.icon className={cn("w-5 h-5 md:w-6 md:h-6", stat.color)} />
                   </div>
                   <div>
                     <p className="hu-label mb-1">{stat.label}</p>
-                    <p className="text-2xl md:text-4xl font-serif font-bold text-black">{stat.value}</p>
+                    <p className="text-2xl md:text-4xl font-serif font-bold text-brand-text">{stat.value}</p>
                   </div>
                 </motion.div>
               ));
@@ -409,7 +410,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
           </div>
 
           {/* Visual Analytics */}
-          <div className="grid grid-cols-1 gap-4 md:gap-8">
+          <div className="grid grid-cols-1 gap-4 md:gap-6">
             <AnalyticsCard title="Session Attendance Rates" subtitle="Last 5 Sessions Comparison">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={sessionStats}>
@@ -433,22 +434,22 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
           {/* My Courses Section */}
           <section className="space-y-6 md:space-y-8">
             <div className="flex items-center gap-4">
-              <BookOpen className="w-6 h-6 text-hu-green" />
-              <h2 className="text-2xl md:text-3xl font-serif font-bold text-black">My Courses</h2>
+              <BookOpen className="w-6 h-6 text-brand-primary" />
+              <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">My Courses</h2>
             </div>
-            <div className="hu-card-alt overflow-hidden border-none">
+            <div className="hu-card-alt overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left min-w-[800px]">
                   <thead>
-                    <tr className="bg-hu-cream/20">
-                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Course Code</th>
-                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Title</th>
-                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Section</th>
-                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Enrolled</th>
-                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Schedule</th>
+                    <tr className="bg-brand-surface">
+                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Course Code</th>
+                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Title</th>
+                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Section</th>
+                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Enrolled</th>
+                      <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Schedule</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-brand-border">
                     {sections.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="px-8 py-12 text-center text-sm font-medium text-gray-400">
@@ -467,15 +468,15 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                             transition={{ delay: i * 0.05 }}
                             className="hover:bg-hu-cream/10 transition-colors group"
                           >
-                            <td className="px-8 py-6 text-sm font-bold text-hu-green font-mono whitespace-nowrap">{course?.courseCode || 'N/A'}</td>
-                            <td className="px-8 py-6 text-sm font-bold text-black whitespace-nowrap">{course?.title || 'N/A'}</td>
+                            <td className="px-8 py-6 text-sm font-bold text-brand-primary font-mono whitespace-nowrap">{course?.courseCode || 'N/A'}</td>
+                            <td className="px-8 py-6 text-sm font-bold text-brand-text whitespace-nowrap">{course?.title || 'N/A'}</td>
                             <td className="px-8 py-6 text-sm font-medium text-gray-400 whitespace-nowrap">{section.sectionId.split('-')[1] || section.sectionId}</td>
                             <td className="px-8 py-6 text-sm font-medium text-gray-400 whitespace-nowrap">{enrolledCount} Students</td>
                             <td className="px-8 py-6 text-sm font-medium text-gray-400 whitespace-nowrap">
                               {Array.isArray(section.schedule) ? (
                                 <div className="flex flex-col gap-1">
                                   {section.schedule.map((block, idx) => (
-                                    <span key={idx} className="text-[10px] font-bold text-hu-green bg-hu-green/5 px-2 py-0.5 rounded-lg">
+                                    <span key={idx} className="text-[10px] font-bold text-brand-primary bg-brand-primary/5 px-2 py-0.5 rounded-lg">
                                       {block.dayOfWeek.slice(0, 3)} • {block.startTime} - {block.endTime}
                                     </span>
                                   ))}
@@ -495,24 +496,24 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
           </section>
 
           {/* Quick Actions Grid */}
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
             {[
-              { title: 'Live Sessions', desc: 'Start and manage active attendance sessions.', icon: Play, color: 'text-blue-500', bg: 'bg-blue-50', path: '/instructor/sessions' },
-              { title: 'My Sections', desc: 'View and manage your assigned course sections.', icon: CalendarDays, color: 'text-purple-500', bg: 'bg-purple-50', path: '/instructor/sections' },
-              { title: 'Reports & Analytics', desc: 'Generate attendance and performance reports.', icon: FileText, color: 'text-green-500', bg: 'bg-green-50', path: '/instructor/reports' },
-              { title: 'Session History', desc: 'Review past completed and expired sessions.', icon: Clock, color: 'text-orange-500', bg: 'bg-orange-50', path: '/instructor/history' }
+              { title: 'Live Sessions', desc: 'Start and manage active attendance sessions.', icon: Play, color: 'text-brand-primary', bg: 'bg-brand-primary/10', path: '/instructor/sessions' },
+              { title: 'My Sections', desc: 'View and manage your assigned course sections.', icon: CalendarDays, color: 'text-brand-primary', bg: 'bg-brand-primary/10', path: '/instructor/sections' },
+              { title: 'Reports & Analytics', desc: 'Generate attendance and performance reports.', icon: FileText, color: 'text-brand-primary', bg: 'bg-brand-primary/10', path: '/instructor/reports' },
+              { title: 'Session History', desc: 'Review past completed and expired sessions.', icon: Clock, color: 'text-brand-primary', bg: 'bg-brand-primary/10', path: '/instructor/history' }
             ].map((action) => (
-              <div key={action.title} className="hu-card-alt p-6 md:p-10 space-y-6 border-none">
+              <div key={action.title} className="hu-card-alt p-4 md:p-8 space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner", action.bg, action.color)}>
+                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shadow-inner", action.bg, action.color)}>
                     <action.icon className="w-6 h-6" />
                   </div>
-                  <h3 className="font-serif font-bold text-xl md:text-2xl text-black">{action.title}</h3>
+                  <h3 className="font-serif font-bold text-xl md:text-2xl text-brand-text">{action.title}</h3>
                 </div>
                 <p className="text-sm text-gray-400 font-medium leading-relaxed">{action.desc}</p>
                 <button 
                   onClick={() => navigate(action.path)}
-                  className="w-full py-4 bg-hu-green/10 hover:bg-hu-green hover:text-white text-black rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] transition-all duration-300"
+                  className="w-full py-4 bg-brand-primary/10 hover:bg-brand-primary hover:text-white dark:hover:text-hu-charcoal text-brand-primary rounded-xl font-bold text-[10px] uppercase tracking-[0.2em] transition-all duration-300"
                 >
                   Manage {action.title.split(' ')[0]}
                 </button>
@@ -528,21 +529,22 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
           <section className="space-y-6 md:space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
               <div className="flex items-center gap-4">
-                <div className="w-1.5 h-8 bg-hu-green rounded-full" />
-                <h2 className="text-2xl md:text-3xl font-serif font-bold text-black">Session Control</h2>
+                <div className="w-1.5 h-8 bg-brand-primary rounded-full" />
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">Session Control</h2>
               </div>
 
               <div className="relative w-full md:w-80">
                 <select
                   value={selectedSection}
                   onChange={(e) => setSelectedSection(e.target.value)}
-                  className="w-full pl-6 pr-12 py-4 bg-white border border-gray-100 rounded-2xl font-bold text-sm text-black appearance-none focus:border-hu-green focus:ring-0 outline-none transition-all shadow-sm"
+                  className="w-full pl-6 pr-12 py-4 bg-white border border-brand-border rounded-xl font-bold text-sm text-brand-text appearance-none focus:border-brand-primary focus:ring-0 outline-none transition-all shadow-sm"
                 >
                   {sections.map((s) => {
                     const center = centers.find(c => c.centerId === s.center);
+                    const programName = programs.find(p => p.programId === s.programType)?.name || s.programType;
                     return (
                       <option key={s.sectionId} value={s.sectionId}>
-                        {s.room} • {center?.name || s.center.toUpperCase()} ({s.programType})
+                        {s.room} • {center?.name || s.center.toUpperCase()} ({programName})
                       </option>
                     );
                   })}
@@ -557,13 +559,13 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="hu-card-alt p-8 md:p-16 text-center space-y-8 border-none"
+            className="hu-card-alt p-8 md:p-16 text-center space-y-8"
           >
-            <div className="w-20 h-20 md:w-24 md:h-24 bg-hu-cream rounded-[32px] flex items-center justify-center mx-auto text-hu-green shadow-inner">
+            <div className="w-16 h-16 md:w-24 md:h-24 bg-hu-cream rounded-[32px] flex items-center justify-center mx-auto text-brand-primary shadow-inner">
               <Clock className="w-12 h-12" />
             </div>
             <div className="space-y-3">
-              <h3 className="text-2xl md:text-3xl font-serif font-bold text-black">Initialize Attendance Session</h3>
+              <h3 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">Initialize Attendance Session</h3>
               <p className="text-gray-400 max-w-md mx-auto font-medium text-sm">
                 Secure your classroom with a unique 6-digit cryptographic token and active GPS geofencing.
               </p>
@@ -582,15 +584,15 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
               const hasGeofence = !!(displayLat && displayLng && displayRadius);
               
               return (
-                <div className="max-w-md mx-auto bg-gray-50 rounded-2xl p-6 text-left space-y-4 border border-gray-100">
+                <div className="max-w-md mx-auto bg-brand-bg rounded-xl p-6 text-left space-y-4 border border-brand-border">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <MapPin className={cn("w-5 h-5", hasGeofence ? "text-hu-green" : "text-orange-500")} />
-                      <h4 className="font-bold text-black">Geofence Status</h4>
+                      <MapPin className={cn("w-5 h-5", hasGeofence ? "text-brand-primary" : "text-orange-500")} />
+                      <h4 className="font-bold text-brand-text">Geofence Status</h4>
                     </div>
                     <div className="flex gap-2">
                       <span className="px-3 py-1 bg-hu-cream text-hu-gold rounded-full text-[10px] font-bold uppercase tracking-widest">
-                        {section.programType}
+                        {programs.find(p => p.programId === section.programType)?.name || section.programType}
                       </span>
                       <span className="px-3 py-1 bg-hu-cream text-hu-gold rounded-full text-[10px] font-bold uppercase tracking-widest">
                         {centers.find(c => c.centerId === section.center)?.name || section.center}
@@ -608,15 +610,15 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <p className="text-gray-400 text-xs uppercase tracking-widest font-bold mb-1">Coordinates</p>
-                          <p className="font-mono font-medium text-black">{parseFloat(displayLat as string).toFixed(4)}, {parseFloat(displayLng as string).toFixed(4)}</p>
+                          <p className="font-mono font-medium text-brand-text">{parseFloat(displayLat as string).toFixed(4)}, {parseFloat(displayLng as string).toFixed(4)}</p>
                         </div>
                         <div>
                           <p className="text-gray-400 text-xs uppercase tracking-widest font-bold mb-1">Radius</p>
-                          <p className="font-medium text-black">{displayRadius} meters</p>
+                          <p className="font-medium text-brand-text">{displayRadius} meters</p>
                         </div>
                       </div>
                       {isEditing ? (
-                        <div className="flex gap-2 pt-2 border-t border-gray-200">
+                        <div className="flex gap-2 pt-2 border-t border-brand-border">
                           <button 
                             onClick={() => handleCancelGeofence(selectedSection)}
                             className="flex-1 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all text-[10px] font-bold uppercase tracking-widest"
@@ -625,23 +627,23 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                           </button>
                           <button 
                             onClick={() => handleSaveGeofence(selectedSection)}
-                            className="flex-1 py-2 bg-hu-green text-white rounded-xl hover:bg-hu-gold transition-all text-[10px] font-bold uppercase tracking-widest"
+                            className="flex-1 py-2 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl hover:bg-hu-gold transition-all text-[10px] font-bold uppercase tracking-widest"
                           >
                             Save Changes
                           </button>
                         </div>
                       ) : (
-                        <div className="flex gap-2 pt-2 border-t border-gray-200">
+                        <div className="flex gap-2 pt-2 border-t border-brand-border">
                           <button 
                             onClick={() => handleSetCurrentLocation(selectedSection)}
-                            className="flex-1 py-2 bg-hu-blue/10 text-hu-blue rounded-xl hover:bg-hu-blue hover:text-white transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                            className="flex-1 py-2 bg-brand-primary/10 text-brand-primary rounded-xl hover:bg-brand-primary hover:text-white  transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest"
                           >
                             <Navigation className="w-3.5 h-3.5" />
                             <span>Update Location</span>
                           </button>
                           <button 
                             onClick={() => handleOpenMap(selectedSection)}
-                            className="flex-1 py-2 bg-hu-gold/10 text-hu-gold rounded-xl hover:bg-hu-gold hover:text-hu-charcoal transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                            className="flex-1 py-2 bg-hu-gold/10 text-hu-gold rounded-xl hover:bg-hu-gold hover:text-brand-text transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest"
                           >
                             <MapIcon className="w-3.5 h-3.5" />
                             <span>Open Map</span>
@@ -655,14 +657,14 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                       <div className="flex gap-2">
                         <button 
                           onClick={() => handleSetCurrentLocation(selectedSection)}
-                          className="flex-1 py-2 bg-hu-blue/10 text-hu-blue rounded-xl hover:bg-hu-blue hover:text-white transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                          className="flex-1 py-2 bg-brand-primary/10 text-brand-primary rounded-xl hover:bg-brand-primary hover:text-white  transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest"
                         >
                           <Navigation className="w-3.5 h-3.5" />
                           <span>Current Location</span>
                         </button>
                         <button 
                           onClick={() => handleOpenMap(selectedSection)}
-                          className="flex-1 py-2 bg-hu-gold/10 text-hu-gold rounded-xl hover:bg-hu-gold hover:text-hu-charcoal transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                          className="flex-1 py-2 bg-hu-gold/10 text-hu-gold rounded-xl hover:bg-hu-gold hover:text-brand-text transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest"
                         >
                           <MapIcon className="w-3.5 h-3.5" />
                           <span>Open Map</span>
@@ -693,18 +695,18 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="hu-card-alt overflow-hidden border-none shadow-2xl shadow-hu-green/20"
+            className="hu-card-alt overflow-hidden shadow-2xl shadow-brand-primary/20"
           >
-            <div className="p-6 md:p-10 bg-hu-green text-white flex flex-col md:flex-row justify-between items-center gap-6 md:gap-10 relative overflow-hidden">
+            <div className="p-4 md:p-8 bg-brand-primary text-white dark:text-hu-charcoal flex flex-col md:flex-row justify-between items-center gap-6 md:gap-10 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[80px] -mr-32 -mt-32" />
               
               <div className="text-center md:text-left space-y-2 relative z-10">
-                <p className="text-white/80 font-bold uppercase tracking-[0.4em] text-[10px]">Active Session Token</p>
-                <h3 className="text-4xl md:text-7xl font-serif font-bold tracking-[0.1em] text-white">{activeSession.sessionToken}</h3>
+                <p className="text-white dark:text-hu-charcoal/80 font-bold uppercase tracking-[0.4em] text-[10px]">Active Session Token</p>
+                <h3 className="text-4xl md:text-7xl font-serif font-bold tracking-[0.1em] text-white dark:text-hu-charcoal">{activeSession.sessionToken}</h3>
                 <div className="flex flex-col md:flex-row items-center gap-3 justify-center md:justify-start pt-2">
                   <div className="px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full flex items-center gap-2">
-                    <Clock className="w-3.5 h-3.5 text-white" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white">Token Expires in {tokenTimeRemaining}</span>
+                    <Clock className="w-3.5 h-3.5 text-white dark:text-hu-charcoal" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white dark:text-hu-charcoal">Token Expires in {tokenTimeRemaining}</span>
                   </div>
                   {activeSession.endTime && (
                     <div className="px-4 py-1.5 bg-red-500/20 backdrop-blur-md rounded-full flex items-center gap-2">
@@ -716,28 +718,28 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
               </div>
               
               <div className="flex items-center gap-4 relative z-10">
-                <button className="px-4 py-3 md:px-8 md:py-4 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-2xl font-bold text-xs uppercase tracking-widest transition-all border border-white/20">
+                <button className="px-4 py-3 md:px-8 md:py-4 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl font-bold text-xs uppercase tracking-widest transition-all border border-white/20">
                   Regenerate
                 </button>
                 <button
                   onClick={handleEndSession}
                   disabled={loading}
-                  className="px-4 py-3 md:px-8 md:py-4 bg-red-500 hover:bg-red-600 text-white rounded-2xl font-bold text-xs uppercase tracking-widest transition-all shadow-xl shadow-red-500/20"
+                  className="px-4 py-3 md:px-8 md:py-4 bg-red-500 hover:bg-red-600 text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-xl shadow-red-500/20"
                 >
                   End Session
                 </button>
               </div>
             </div>
 
-            <div className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 bg-white">
+            <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 bg-white">
               {[
-                { label: 'Present', value: liveAttendance.length, color: 'text-hu-green' },
-                { label: 'Late Arrival', value: '0', color: 'text-hu-charcoal/40' },
-                { label: 'Total Enrolled', value: '45', color: 'text-black' }
+                { label: 'Present', value: liveAttendance.length, color: 'text-brand-primary' },
+                { label: 'Late Arrival', value: '0', color: 'text-brand-text/40' },
+                { label: 'Total Enrolled', value: '45', color: 'text-brand-text' }
               ].map((stat, i) => (
-                <div key={stat.label} className={cn("text-center space-y-2", i === 1 && "md:border-x border-gray-50")}>
+                <div key={stat.label} className={cn("text-center space-y-2", i === 1 && "md:border-x border-brand-border")}>
                   <p className="hu-label">{stat.label}</p>
-                  <p className={cn("text-3xl md:text-5xl font-serif font-bold", stat.color)}>{stat.value}</p>
+                  <p className={cn("text-2xl md:text-4xl font-serif font-bold", stat.color)}>{stat.value}</p>
                 </div>
               ))}
             </div>
@@ -751,7 +753,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               <div className="w-1.5 h-8 bg-hu-gold rounded-full" />
-              <h2 className="text-2xl md:text-3xl font-serif font-bold text-black">Live Attendance</h2>
+              <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">Live Attendance</h2>
             </div>
             <div className="flex items-center gap-4">
               <div className="relative">
@@ -765,20 +767,20 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
             </div>
           </div>
 
-          <div className="hu-card-alt overflow-hidden border-none">
+          <div className="hu-card-alt overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left min-w-[900px]">
                 <thead>
-                <tr className="bg-hu-cream/20">
-                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Student</th>
-                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">ID Number</th>
-                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Marked At</th>
-                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Location</th>
-                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Status</th>
-                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Manual Override</th>
+                <tr className="bg-brand-surface">
+                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Student</th>
+                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">ID Number</th>
+                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Marked At</th>
+                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Location</th>
+                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Status</th>
+                  <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Manual Override</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-brand-border">
                 {(() => {
                   const sectionEnrollments = enrollments.filter(e => e.sectionId === activeSession.sectionId);
                   const enrolledStudents = sectionEnrollments.map(e => users.find(u => u.userId === e.studentId)).filter(Boolean) as User[];
@@ -808,7 +810,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                             <div className="w-10 h-10 bg-hu-cream rounded-xl flex items-center justify-center text-hu-gold font-bold text-xs shadow-sm">
                               {student.fullName.charAt(0)}
                             </div>
-                            <span className="text-sm font-bold text-hu-green">{student.fullName}</span>
+                            <span className="text-sm font-bold text-brand-primary">{student.fullName}</span>
                           </div>
                         </td>
                         <td className="px-8 py-6 text-xs font-bold text-gray-400 font-mono whitespace-nowrap">{student.idNumber || 'N/A'}</td>
@@ -836,7 +838,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                               {record.status === 'present' ? 'Verified' : record.status.toUpperCase()}
                             </span>
                           ) : (
-                            <span className="px-4 py-1.5 bg-gray-50 text-gray-400 rounded-full text-[10px] font-bold uppercase tracking-widest border border-gray-100">
+                            <span className="px-4 py-1.5 bg-brand-bg text-gray-400 rounded-full text-[10px] font-bold uppercase tracking-widest border border-brand-border">
                               Absent
                             </span>
                           )}
@@ -850,7 +852,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                                 className={cn(
                                   "px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all",
                                   (record?.status === status || (!record && status === 'absent'))
-                                    ? "bg-hu-gold text-white shadow-sm"
+                                    ? "bg-hu-gold text-white dark:text-hu-charcoal shadow-sm"
                                     : "bg-gray-100 text-gray-400 hover:bg-hu-cream hover:text-hu-gold"
                                 )}
                               >
@@ -875,17 +877,17 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
       {view === 'sections' && (
         <section className="space-y-8">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl md:text-3xl font-serif font-bold text-black">My Sections</h2>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">My Sections</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {sections.map((section) => {
               const course = courses.find(c => c.courseId === section.courseId);
               const enrolledCount = enrollments.filter(e => e.sectionId === section.sectionId).length;
               return (
-                <div key={section.sectionId} className="hu-card-alt p-5 md:p-5 md:p-8 space-y-6">
+                <div key={section.sectionId} className="hu-card-alt p-5 md:p-4 md:p-6 space-y-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-lg md:text-xl font-serif font-bold text-black">{course?.courseCode} - {course?.title}</h3>
+                      <h3 className="text-lg md:text-xl font-serif font-bold text-brand-text">{course?.courseCode} - {course?.title}</h3>
                       <p className="text-sm text-gray-400 font-medium">Section {section.sectionId.split('-')[1]} • {section.room}</p>
                     </div>
                     <div className="flex gap-2">
@@ -894,7 +896,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                           setRosterSectionId(section.sectionId);
                           setIsRosterModalOpen(true);
                         }}
-                        className="p-2 hover:bg-hu-cream rounded-lg transition-colors text-hu-gold hover:text-black flex items-center gap-2"
+                        className="p-2 hover:bg-hu-cream rounded-lg transition-colors text-hu-gold hover:text-brand-text flex items-center gap-2"
                         title="View Roster"
                       >
                         <Users className="w-4 h-4" />
@@ -906,7 +908,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                           setTempSchedule(Array.isArray(section.schedule) ? [...section.schedule] : []);
                           setIsScheduleModalOpen(true);
                         }}
-                        className="p-2 hover:bg-hu-cream rounded-lg transition-colors text-hu-gold hover:text-black flex items-center gap-2"
+                        className="p-2 hover:bg-hu-cream rounded-lg transition-colors text-hu-gold hover:text-brand-text flex items-center gap-2"
                         title="Edit Schedule"
                       >
                         <CalendarDays className="w-4 h-4" />
@@ -914,30 +916,30 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                       </button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-brand-border">
                     <div>
                       <p className="hu-label">Schedule</p>
                       <div className="mt-1">
                         {Array.isArray(section.schedule) ? (
                           <div className="flex flex-col gap-1">
                             {section.schedule.map((block, idx) => (
-                              <span key={idx} className="text-[10px] font-bold text-hu-green">
+                              <span key={idx} className="text-[10px] font-bold text-brand-primary">
                                 {block.dayOfWeek.slice(0, 3)} • {block.startTime} - {block.endTime}
                               </span>
                             ))}
                           </div>
                         ) : (
-                          <p className="text-xs font-bold text-black">{section.schedule || 'Not Scheduled'}</p>
+                          <p className="text-xs font-bold text-brand-text">{section.schedule || 'Not Scheduled'}</p>
                         )}
                       </div>
                     </div>
                     <div>
                       <p className="hu-label">Students</p>
-                      <p className="text-xs font-bold text-black mt-1">{enrolledCount} Enrolled</p>
+                      <p className="text-xs font-bold text-brand-text mt-1">{enrolledCount} Enrolled</p>
                     </div>
                   </div>
                   {section.meetingDates && section.meetingDates.length > 0 && (
-                    <div className="pt-4 border-t border-gray-50">
+                    <div className="pt-4 border-t border-brand-border">
                       <p className="hu-label mb-2">Specific Meeting Weekends</p>
                       <div className="flex flex-wrap gap-2">
                         {section.meetingDates.map((date, idx) => (
@@ -948,7 +950,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                       </div>
                     </div>
                   )}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-50">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-brand-border">
                     {section.midExamDates && section.midExamDates.length > 0 && (
                       <div>
                         <p className="hu-label mb-1">Mid Exam</p>
@@ -975,13 +977,13 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                     )}
                   </div>
                   {/* Geofence Settings Section */}
-                  <div className="mt-6 pt-6 border-t border-gray-50">
+                  <div className="mt-6 pt-6 border-t border-brand-border">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-bold text-black">Geofence Settings</h4>
+                      <h4 className="text-lg font-bold text-brand-text">Geofence Settings</h4>
                       <div className="flex gap-2">
                         <button 
                           onClick={() => handleSetCurrentLocation(section.sectionId)}
-                          className="p-2 bg-hu-blue/10 text-hu-blue rounded-xl hover:bg-hu-blue hover:text-white transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                          className="p-2 bg-brand-primary/10 text-brand-primary rounded-xl hover:bg-brand-primary hover:text-white  transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
                           title="Set from Current Location"
                         >
                           <Navigation className="w-3.5 h-3.5" />
@@ -989,7 +991,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                         </button>
                         <button 
                           onClick={() => handleOpenMap(section.sectionId)}
-                          className="p-2 bg-hu-gold/10 text-hu-gold rounded-xl hover:bg-hu-gold hover:text-hu-charcoal transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                          className="p-2 bg-hu-gold/10 text-hu-gold rounded-xl hover:bg-hu-gold hover:text-brand-text transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
                           title="Open Map"
                         >
                           <MapIcon className="w-3.5 h-3.5" />
@@ -997,7 +999,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                         </button>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                       <div>
                         <label htmlFor={`latitude-${section.sectionId}`} className="hu-label">Latitude</label>
                         <input
@@ -1035,7 +1037,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                       </div>
                     </div>
                     <div className="flex justify-end gap-4 mt-6">
-                      <button className="hu-button-rounded bg-gray-100 text-hu-charcoal hover:bg-gray-200 py-2 px-4" onClick={() => handleCancelGeofence(section.sectionId)}>Cancel</button>
+                      <button className="hu-button-rounded bg-gray-100 text-brand-text hover:bg-gray-200 py-2 px-4" onClick={() => handleCancelGeofence(section.sectionId)}>Cancel</button>
                       <button className="hu-button-rounded py-2 px-4" onClick={() => handleSaveGeofence(section.sectionId)}>Save</button>
                     </div>
                   </div>
@@ -1052,7 +1054,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="w-1.5 h-8 bg-hu-gold rounded-full" />
-              <h2 className="text-2xl md:text-3xl font-serif font-bold text-black">Course Performance Analytics</h2>
+              <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">Course Performance Analytics</h2>
             </div>
             <div className="flex items-center gap-4">
               <select 
@@ -1086,7 +1088,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                     <div className="w-16 h-16 bg-hu-cream rounded-full flex items-center justify-center text-hu-gold mx-auto mb-6">
                       <BarChart3 className="w-8 h-8" />
                     </div>
-                    <h3 className="text-xl font-serif font-bold text-black">No Data Available</h3>
+                    <h3 className="text-xl font-serif font-bold text-brand-text">No Data Available</h3>
                     <p className="text-sm text-gray-400 mt-2">This section hasn't had any sessions or enrollments yet.</p>
                   </div>
                 );
@@ -1098,34 +1100,34 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="hu-card-alt p-6 space-y-2">
                       <p className="hu-label">Overall Attendance</p>
-                      <h4 className="text-3xl font-serif font-bold text-hu-green">{stats.overallRate.toFixed(1)}%</h4>
+                      <h4 className="text-3xl font-serif font-bold text-brand-primary">{stats.overallRate.toFixed(1)}%</h4>
                       <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden mt-4">
-                        <div className="bg-hu-green h-full" style={{ width: `${stats.overallRate}%` }} />
+                        <div className="bg-brand-primary h-full" style={{ width: `${stats.overallRate}%` }} />
                       </div>
                     </div>
                     <div className="hu-card-alt p-6 space-y-2">
                       <p className="hu-label">Program & Center</p>
-                      <h4 className="text-lg font-bold text-black capitalize">{section?.programType}</h4>
+                      <h4 className="text-lg font-bold text-brand-text capitalize">{programs.find(p => p.programId === section?.programType)?.name || section?.programType}</h4>
                       <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">
                         {centers.find(c => c.centerId === section?.center)?.name || section?.center} Center
                       </p>
                     </div>
                     <div className="hu-card-alt p-6 space-y-2">
                       <p className="hu-label">Total Sessions</p>
-                      <h4 className="text-3xl font-serif font-bold text-black">{stats.sessionCount}</h4>
+                      <h4 className="text-3xl font-serif font-bold text-brand-text">{stats.sessionCount}</h4>
                       <p className="text-xs text-gray-400 font-medium">Completed to date</p>
                     </div>
                     <div className="hu-card-alt p-6 space-y-2">
                       <p className="hu-label">Enrollment</p>
-                      <h4 className="text-3xl font-serif font-bold text-black">{stats.enrolledCount}</h4>
+                      <h4 className="text-3xl font-serif font-bold text-brand-text">{stats.enrolledCount}</h4>
                       <p className="text-xs text-gray-400 font-medium">Active students</p>
                     </div>
                   </div>
 
                   {/* Charts Section */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                     <div className="hu-card-alt p-8 space-y-6">
-                      <h3 className="text-lg font-serif font-bold text-black">Attendance Trend</h3>
+                      <h3 className="text-lg font-serif font-bold text-brand-text">Attendance Trend</h3>
                       <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={stats.sessionStats}>
@@ -1144,17 +1146,17 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                     </div>
 
                     <div className="hu-card-alt p-8 space-y-6">
-                      <h3 className="text-lg font-serif font-bold text-black">Status Distribution</h3>
+                      <h3 className="text-lg font-serif font-bold text-brand-text">Status Distribution</h3>
                       <div className="flex flex-col justify-center h-full space-y-8">
                         {[
-                          { label: 'Present', count: stats.totalPresent, color: 'bg-hu-green', total: stats.totalPresent + stats.totalLate + stats.totalAbsent },
+                          { label: 'Present', count: stats.totalPresent, color: 'bg-brand-primary', total: stats.totalPresent + stats.totalLate + stats.totalAbsent },
                           { label: 'Late', count: stats.totalLate, color: 'bg-hu-gold', total: stats.totalPresent + stats.totalLate + stats.totalAbsent },
                           { label: 'Absent', count: stats.totalAbsent, color: 'bg-red-400', total: stats.totalPresent + stats.totalLate + stats.totalAbsent }
                         ].map((item) => (
                           <div key={item.label} className="space-y-2">
                             <div className="flex justify-between items-center">
                               <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{item.label}</span>
-                              <span className="text-sm font-bold text-black">{item.count} ({((item.count / item.total) * 100).toFixed(1)}%)</span>
+                              <span className="text-sm font-bold text-brand-text">{item.count} ({((item.count / item.total) * 100).toFixed(1)}%)</span>
                             </div>
                             <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
                               <div className={cn("h-full", item.color)} style={{ width: `${(item.count / item.total) * 100}%` }} />
@@ -1167,23 +1169,23 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
 
                   {/* Detailed Session Summary Table */}
                   <div className="space-y-6">
-                    <h3 className="text-xl font-serif font-bold text-black">Session-by-Session Summary</h3>
-                    <div className="hu-card-alt overflow-hidden border-none">
+                    <h3 className="text-xl font-serif font-bold text-brand-text">Session-by-Session Summary</h3>
+                    <div className="hu-card-alt overflow-hidden">
                       <div className="overflow-x-auto">
                         <table className="w-full text-left">
                           <thead>
-                            <tr className="bg-hu-cream/20">
-                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70">Date</th>
-                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70">Present</th>
-                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70">Late</th>
-                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70">Absent</th>
-                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70">Attendance Rate</th>
+                            <tr className="bg-brand-surface">
+                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted">Date</th>
+                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted">Present</th>
+                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted">Late</th>
+                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted">Absent</th>
+                              <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted">Attendance Rate</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-gray-50">
+                          <tbody className="divide-y divide-brand-border">
                             {stats.sessionStats.map((s, i) => (
                               <tr key={i} className="hover:bg-hu-cream/10 transition-colors">
-                                <td className="px-8 py-4 text-sm font-bold text-hu-green">{s.date}</td>
+                                <td className="px-8 py-4 text-sm font-bold text-brand-primary">{s.date}</td>
                                 <td className="px-8 py-4 text-sm font-medium text-gray-600">{s.present}</td>
                                 <td className="px-8 py-4 text-sm font-medium text-gray-600">{s.late}</td>
                                 <td className="px-8 py-4 text-sm font-medium text-gray-600">{s.absent}</td>
@@ -1192,7 +1194,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                                     <div className="flex-1 bg-gray-100 h-1.5 rounded-full overflow-hidden max-w-[100px]">
                                       <div className="bg-hu-gold h-full" style={{ width: `${s.rate}%` }} />
                                     </div>
-                                    <span className="text-xs font-bold text-black">{s.rate.toFixed(0)}%</span>
+                                    <span className="text-xs font-bold text-brand-text">{s.rate.toFixed(0)}%</span>
                                   </div>
                                 </td>
                               </tr>
@@ -1207,14 +1209,14 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                   <div className="flex flex-wrap gap-4">
                     <button 
                       onClick={() => handleDownloadReport('Course')}
-                      className="flex items-center gap-3 px-8 py-4 bg-hu-green text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-hu-green/10"
+                      className="flex items-center gap-3 px-8 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-brand-primary/20"
                     >
                       <Download className="w-4 h-4" />
                       Download Full Course Report
                     </button>
                     <button 
                       onClick={() => handleDownloadReport('Summary')}
-                      className="flex items-center gap-3 px-8 py-4 bg-white border border-hu-cream text-hu-green rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-hu-cream transition-all"
+                      className="flex items-center gap-3 px-8 py-4 bg-white border border-hu-cream text-brand-primary rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-cream transition-all"
                     >
                       <FileText className="w-4 h-4" />
                       Export Class Summary (CSV)
@@ -1224,23 +1226,23 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
               );
             })()
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-8">
               {[
                 { title: 'Class Summary', desc: 'Detailed attendance for the current session.', type: 'Session' },
                 { title: 'Course Analytics', desc: 'Long-term trends and student performance.', type: 'Course' },
                 { title: 'Student Profile', desc: 'Individual attendance history and logs.', type: 'Student' }
               ].map((report) => (
                 <div key={report.title} className="hu-card-alt p-8 space-y-6">
-                  <div className="w-12 h-12 bg-hu-cream rounded-2xl flex items-center justify-center text-hu-green">
+                  <div className="w-12 h-12 bg-hu-cream rounded-xl flex items-center justify-center text-brand-primary">
                     <FileText className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-black">{report.title}</h3>
+                    <h3 className="font-bold text-brand-text">{report.title}</h3>
                     <p className="text-xs text-gray-400 mt-1">{report.desc}</p>
                   </div>
                   <button 
                     onClick={() => handleDownloadReport(report.type)}
-                    className="w-full py-3 bg-hu-green text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-hu-gold transition-all"
+                    className="w-full py-3 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-hu-gold transition-all"
                   >
                     Generate Report
                   </button>
@@ -1253,9 +1255,9 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
           <div className="space-y-6">
             <div className="flex items-center gap-4">
               <AlertCircle className="w-6 h-6 text-red-500" />
-              <h2 className="text-xl md:text-2xl font-serif font-bold text-black">Absentee Alerts (At-Risk Students)</h2>
+              <h2 className="text-xl md:text-2xl font-serif font-bold text-brand-text">Absentee Alerts (At-Risk Students)</h2>
             </div>
-            <div className="hu-card-alt overflow-hidden border-none">
+            <div className="hu-card-alt overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left min-w-[600px]">
                   <thead>
@@ -1266,11 +1268,11 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                       <th className="px-8 py-4 text-[11px] uppercase tracking-[0.2em] font-bold text-red-700 whitespace-nowrap">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-brand-border">
                     {atRiskStudents.map((student) => (
                       <tr key={student.id} className="hover:bg-red-50/20 transition-colors">
                         <td className="px-8 py-6 whitespace-nowrap">
-                          <p className="text-sm font-bold text-black">{student.name}</p>
+                          <p className="text-sm font-bold text-brand-text">{student.name}</p>
                           <p className="text-[10px] text-gray-400 font-mono">{student.id}</p>
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap">
@@ -1282,7 +1284,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                           </span>
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap">
-                          <button className="text-[10px] font-bold text-hu-green hover:underline uppercase tracking-widest">Notify Student</button>
+                          <button className="text-[10px] font-bold text-brand-primary hover:underline uppercase tracking-widest">Notify Student</button>
                         </td>
                       </tr>
                     ))}
@@ -1297,7 +1299,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
       {view === 'history' && (
         <section className="space-y-8">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl md:text-3xl font-serif font-bold text-black">Session History</h2>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">Session History</h2>
             <div className="flex items-center gap-4">
                <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
@@ -1310,19 +1312,19 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
             </div>
           </div>
 
-          <div className="hu-card-alt overflow-hidden border-none">
+          <div className="hu-card-alt overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left min-w-[800px]">
                 <thead>
-                  <tr className="bg-hu-cream/20">
-                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Date</th>
-                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Course & Section</th>
-                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Attendance</th>
-                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Status</th>
-                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Actions</th>
+                  <tr className="bg-brand-surface">
+                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Date</th>
+                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Course & Section</th>
+                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Attendance</th>
+                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Status</th>
+                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-brand-border">
                   {sessions
                     .filter(s => s.status !== 'active' && sections.some(sec => sec.sectionId === s.sectionId))
                     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -1342,22 +1344,22 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                           className="hover:bg-hu-cream/10 transition-colors group"
                         >
                           <td className="px-8 py-6 whitespace-nowrap">
-                            <p className="text-sm font-bold text-black">{format(new Date(s.date), 'MMM dd, yyyy')}</p>
+                            <p className="text-sm font-bold text-brand-text">{format(new Date(s.date), 'MMM dd, yyyy')}</p>
                             <p className="text-[10px] text-gray-400 font-mono uppercase tracking-widest mt-1">ID: {s.sessionId.split('-')[1]}</p>
                           </td>
                           <td className="px-8 py-6 whitespace-nowrap">
-                            <p className="text-sm font-bold text-black">{course?.courseCode}</p>
+                            <p className="text-sm font-bold text-brand-text">{course?.courseCode}</p>
                             <p className="text-xs text-gray-400 mt-1">Section {section?.sectionId.split('-')[1]}</p>
                           </td>
                           <td className="px-8 py-6 whitespace-nowrap">
                             <div className="flex items-center gap-3">
                               <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                 <div 
-                                  className="h-full bg-hu-green transition-all duration-1000" 
+                                  className="h-full bg-brand-primary transition-all duration-1000" 
                                   style={{ width: `${attendanceRate}%` }}
                                 />
                               </div>
-                              <span className="text-xs font-bold text-black">{sessionAttendance.length}/{enrolledCount}</span>
+                              <span className="text-xs font-bold text-brand-text">{sessionAttendance.length}/{enrolledCount}</span>
                             </div>
                           </td>
                           <td className="px-8 py-6 whitespace-nowrap">
@@ -1410,9 +1412,9 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="relative w-full max-w-3xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
           >
-            <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-hu-cream/30 shrink-0">
+            <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30 shrink-0">
               <div>
-                <h3 className="text-2xl font-serif font-bold text-black">Class Roster</h3>
+                <h3 className="text-2xl font-serif font-bold text-brand-text">Class Roster</h3>
                 <p className="text-sm text-gray-400 font-medium mt-1">
                   {(() => {
                     const section = sections.find(s => s.sectionId === rosterSectionId);
@@ -1429,13 +1431,13 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
             <div className="overflow-y-auto p-0">
               <table className="w-full text-left">
                 <thead className="sticky top-0 bg-white shadow-sm z-10">
-                  <tr className="bg-hu-cream/20">
-                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Student</th>
-                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">ID Number</th>
-                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-gray-black/70 whitespace-nowrap">Department</th>
+                  <tr className="bg-brand-surface">
+                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Student</th>
+                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">ID Number</th>
+                    <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Department</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-brand-border">
                   {(() => {
                     const sectionEnrollments = enrollments.filter(e => e.sectionId === rosterSectionId);
                     const enrolledStudents = sectionEnrollments.map(e => users.find(u => u.userId === e.studentId)).filter(Boolean) as User[];
@@ -1463,7 +1465,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                             <div className="w-10 h-10 bg-hu-cream rounded-xl flex items-center justify-center text-hu-gold font-bold text-xs shadow-sm">
                               {student.fullName.charAt(0)}
                             </div>
-                            <span className="text-sm font-bold text-hu-green">{student.fullName}</span>
+                            <span className="text-sm font-bold text-brand-primary">{student.fullName}</span>
                           </div>
                         </td>
                         <td className="px-8 py-4 text-xs font-bold text-gray-400 font-mono whitespace-nowrap">{student.idNumber || 'N/A'}</td>
@@ -1494,9 +1496,9 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="relative w-full max-w-4xl bg-white rounded-[32px] shadow-2xl overflow-hidden"
             >
-              <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-hu-cream/30">
+              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
                 <div>
-                  <h3 className="text-2xl font-serif font-bold text-black">
+                  <h3 className="text-2xl font-serif font-bold text-brand-text">
                     Adjust Geofence
                   </h3>
                   <p className="text-xs text-gray-400 font-medium uppercase tracking-widest mt-1">
@@ -1509,7 +1511,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
               </div>
               
               <div className="p-8 space-y-6">
-                <div className="h-[400px] w-full rounded-2xl overflow-hidden border border-gray-100 shadow-inner relative z-0">
+                <div className="h-[400px] w-full rounded-xl overflow-hidden border border-brand-border shadow-inner relative z-0">
                   <MapContainer 
                     center={[
                       parseFloat(editingGeofence[mapSectionId]?.latitude || '0') || 0, 
@@ -1546,7 +1548,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                   </MapContainer>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
                   <div className="space-y-2">
                     <label className="hu-label">Latitude</label>
                     <input
@@ -1581,7 +1583,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                 <div className="pt-4 flex gap-4">
                   <button
                     onClick={() => setIsMapModalOpen(false)}
-                    className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
+                    className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
                   >
                     Cancel
                   </button>
@@ -1590,7 +1592,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                       handleSaveGeofence(mapSectionId);
                       setIsMapModalOpen(false);
                     }}
-                    className="flex-1 py-4 bg-hu-green text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-hu-green/20"
+                    className="flex-1 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-brand-primary/20"
                   >
                     Save Geofence
                   </button>
@@ -1618,8 +1620,8 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden"
             >
-              <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-hu-cream/30">
-                <h3 className="text-2xl font-serif font-bold text-black">Edit Section Schedule</h3>
+              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
+                <h3 className="text-2xl font-serif font-bold text-brand-text">Edit Section Schedule</h3>
                 <button onClick={() => setIsScheduleModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-all">
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
@@ -1629,7 +1631,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                   <div className="flex items-center justify-between">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Schedule Blocks</label>
                     <div className="flex gap-2">
-                      {sections.find(s => s.sectionId === editingScheduleSectionId)?.programType === 'extension' && (
+                      {programs.find(p => p.programId === sections.find(s => s.sectionId === editingScheduleSectionId)?.programType)?.name.toLowerCase() === 'extension' && (
                         <button
                           type="button"
                           onClick={() => setTempSchedule([
@@ -1637,7 +1639,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                             { dayOfWeek: 'Saturday', startTime: '14:00', endTime: '16:00' },
                             { dayOfWeek: 'Sunday', startTime: '08:30', endTime: '11:30' }
                           ])}
-                          className="text-[10px] font-bold text-hu-gold hover:text-hu-green transition-colors border border-hu-gold/20 px-2 py-1 rounded-lg"
+                          className="text-[10px] font-bold text-hu-gold hover:text-brand-primary transition-colors border border-hu-gold/20 px-2 py-1 rounded-lg"
                         >
                           Weekend Preset
                         </button>
@@ -1645,7 +1647,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                       <button
                         type="button"
                         onClick={() => setTempSchedule([...tempSchedule, { dayOfWeek: 'Monday', startTime: '08:00', endTime: '10:00' }])}
-                        className="text-xs font-bold text-hu-green hover:text-hu-gold transition-colors"
+                        className="text-xs font-bold text-brand-primary hover:text-hu-gold transition-colors"
                       >
                         + Add Block
                       </button>
@@ -1653,7 +1655,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                   </div>
 
                   {tempSchedule.map((block, index) => (
-                    <div key={index} className="flex items-center gap-4 bg-gray-50 p-4 rounded-2xl">
+                    <div key={index} className="flex items-center gap-4 bg-brand-bg p-4 rounded-xl">
                       <select
                         value={block.dayOfWeek}
                         onChange={(e) => {
@@ -1709,7 +1711,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                 <div className="pt-4 flex gap-4">
                   <button
                     onClick={() => setIsScheduleModalOpen(false)}
-                    className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
+                    className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
                   >
                     Cancel
                   </button>
@@ -1718,7 +1720,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                       updateSection(editingScheduleSectionId, { schedule: tempSchedule });
                       setIsScheduleModalOpen(false);
                     }}
-                    className="flex-1 py-4 bg-hu-green text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-hu-green/20"
+                    className="flex-1 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-brand-primary/20"
                   >
                     Save Schedule
                   </button>

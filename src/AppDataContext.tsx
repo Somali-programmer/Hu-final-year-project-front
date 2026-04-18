@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { User, Course, Section, ClassSession, Attendance, Semester, Enrollment, AuditLog, ProgramType, Center, CenterInfo } from './types';
-import { MOCK_USERS, MOCK_COURSES, MOCK_SECTIONS, MOCK_SESSIONS, MOCK_ATTENDANCE, MOCK_SEMESTERS, MOCK_ENROLLMENTS, MOCK_CENTERS } from './mockData';
+import { User, Course, Section, ClassSession, Attendance, Semester, Enrollment, AuditLog, ProgramType, Center, CenterInfo, ProgramInfo, BatchInfo } from './types';
+import { MOCK_USERS, MOCK_COURSES, MOCK_SECTIONS, MOCK_SESSIONS, MOCK_ATTENDANCE, MOCK_SEMESTERS, MOCK_ENROLLMENTS, MOCK_CENTERS, MOCK_PROGRAMS, MOCK_BATCHES } from './mockData';
 
 interface AppDataContextType {
   users: User[];
@@ -12,6 +12,8 @@ interface AppDataContextType {
   enrollments: Enrollment[];
   auditLogs: AuditLog[];
   centers: CenterInfo[];
+  programs: ProgramInfo[];
+  batches: BatchInfo[];
   
   // Actions
   addSection: (section: Section) => void;
@@ -33,6 +35,12 @@ interface AppDataContextType {
   addCenter: (center: CenterInfo) => void;
   updateCenter: (centerId: string, updates: Partial<CenterInfo>) => void;
   deleteCenter: (centerId: string) => void;
+  addProgram: (program: ProgramInfo) => void;
+  updateProgram: (programId: string, updates: Partial<ProgramInfo>) => void;
+  deleteProgram: (programId: string) => void;
+  addBatch: (batch: BatchInfo) => void;
+  updateBatch: (batchId: string, updates: Partial<BatchInfo>) => void;
+  deleteBatch: (batchId: string) => void;
 }
 
 const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
@@ -47,6 +55,8 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [enrollments, setEnrollments] = useState<Enrollment[]>(MOCK_ENROLLMENTS);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [centers, setCenters] = useState<CenterInfo[]>(MOCK_CENTERS);
+  const [programs, setPrograms] = useState<ProgramInfo[]>(MOCK_PROGRAMS);
+  const [batches, setBatches] = useState<BatchInfo[]>(MOCK_BATCHES);
 
   const addAuditLog = (log: Omit<AuditLog, 'logId' | 'timestamp'>) => {
     const newLog: AuditLog = {
@@ -63,8 +73,9 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
     // Auto-enroll matching students
     const matchingStudents = users.filter(u => 
       u.role === 'student' && 
-      u.programType?.toLowerCase() === section.programType?.toLowerCase() && 
-      u.center?.toLowerCase() === section.center?.toLowerCase()
+      u.programType === section.programType && 
+      u.center === section.center &&
+      (!section.batchId || u.batch === section.batchId)
     );
 
     if (matchingStudents.length > 0) {
@@ -83,11 +94,12 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
       const newSections = prev.map(s => s.sectionId === sectionId ? { ...s, ...updates } : s);
       const updatedSection = newSections.find(s => s.sectionId === sectionId);
       
-      if (updatedSection && (updates.programType || updates.center)) {
+      if (updatedSection && (updates.programType || updates.center || updates.batchId)) {
         const matchingStudents = users.filter(u => 
           u.role === 'student' && 
-          u.programType?.toLowerCase() === updatedSection.programType?.toLowerCase() && 
-          u.center?.toLowerCase() === updatedSection.center?.toLowerCase()
+          u.programType === updatedSection.programType && 
+          u.center === updatedSection.center &&
+          (!updatedSection.batchId || u.batch === updatedSection.batchId)
         );
 
         const newEnrollments: Enrollment[] = matchingStudents.map(student => ({
@@ -128,8 +140,9 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
     // If student, auto-enroll in matching sections
     if (user.role === 'student') {
       const matchingSections = sections.filter(s => 
-        s.programType?.toLowerCase() === user.programType?.toLowerCase() && 
-        s.center?.toLowerCase() === user.center?.toLowerCase()
+        s.programType === user.programType && 
+        s.center === user.center &&
+        (!s.batchId || s.batchId === user.batch)
       );
 
       if (matchingSections.length > 0) {
@@ -178,13 +191,38 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
     setCenters(prev => prev.filter(c => c.centerId !== centerId));
   };
 
+  const addProgram = (program: ProgramInfo) => {
+    setPrograms(prev => [...prev, program]);
+  };
+
+  const updateProgram = (programId: string, updates: Partial<ProgramInfo>) => {
+    setPrograms(prev => prev.map(p => p.programId === programId ? { ...p, ...updates } : p));
+  };
+
+  const deleteProgram = (programId: string) => {
+    setPrograms(prev => prev.filter(p => p.programId !== programId));
+  };
+
+  const addBatch = (batch: BatchInfo) => {
+    setBatches(prev => [...prev, batch]);
+  };
+
+  const updateBatch = (batchId: string, updates: Partial<BatchInfo>) => {
+    setBatches(prev => prev.map(b => b.batchId === batchId ? { ...b, ...updates } : b));
+  };
+
+  const deleteBatch = (batchId: string) => {
+    setBatches(prev => prev.filter(b => b.batchId !== batchId));
+  };
+
   return (
     <AppDataContext.Provider value={{
-      users, courses, sections, sessions, attendance, semesters, enrollments, auditLogs, centers,
+      users, courses, sections, sessions, attendance, semesters, enrollments, auditLogs, centers, programs, batches,
       addSection, updateSection, deleteSection, addSemester, setActiveSemester,
       addUser, updateUser, deleteUser, addCourse, updateCourse, deleteCourse,
       addAttendance, addSession, updateSession, addEnrollment, addAuditLog,
-      addCenter, updateCenter, deleteCenter
+      addCenter, updateCenter, deleteCenter, addProgram, updateProgram, deleteProgram,
+      addBatch, updateBatch, deleteBatch
     }}>
       {children}
     </AppDataContext.Provider>

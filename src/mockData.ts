@@ -1,4 +1,4 @@
-import { User, Course, Section, ClassSession, Attendance, Semester, Enrollment, CenterInfo } from './types';
+import { User, Course, Section, ClassSession, Attendance, Semester, Enrollment, CenterInfo, ProgramInfo, BatchInfo } from './types';
 
 export const MOCK_CENTERS: CenterInfo[] = [
   {
@@ -20,6 +20,57 @@ export const MOCK_CENTERS: CenterInfo[] = [
     name: 'Harer Center',
     location: 'Harer',
     description: 'Extension center located in Harer.',
+    createdAt: new Date().toISOString()
+  }
+];
+
+export const MOCK_PROGRAMS: ProgramInfo[] = [
+  {
+    programId: 'prog-regular',
+    name: 'Regular',
+    durationYears: 4,
+    description: 'Standard full-time day program.',
+    createdAt: new Date().toISOString()
+  },
+  {
+    programId: 'prog-extension',
+    name: 'Extension',
+    durationYears: 5,
+    description: 'Weekend and evening program for working professionals.',
+    createdAt: new Date().toISOString()
+  },
+  {
+    programId: 'prog-summer',
+    name: 'Summer',
+    durationYears: 5,
+    description: 'Intensive summer program.',
+    createdAt: new Date().toISOString()
+  }
+];
+
+export const MOCK_BATCHES: BatchInfo[] = [
+  {
+    batchId: 'batch-2015',
+    name: 'Year 3 (2015 Entry)',
+    entryYear: '2015',
+    currentYear: 3,
+    expectedGraduation: '2019',
+    createdAt: new Date().toISOString()
+  },
+  {
+    batchId: 'batch-2016',
+    name: 'Year 2 (2016 Entry)',
+    entryYear: '2016',
+    currentYear: 2,
+    expectedGraduation: '2020',
+    createdAt: new Date().toISOString()
+  },
+  {
+    batchId: 'batch-2014',
+    name: 'Year 4 (2014 Entry)',
+    entryYear: '2014',
+    currentYear: 4,
+    expectedGraduation: '2018',
     createdAt: new Date().toISOString()
   }
 ];
@@ -81,8 +132,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'regular',
-    center: 'main',
+    programType: 'prog-1',
+    center: 'center-1',
   },
   {
     userId: 'std-2',
@@ -93,8 +144,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'regular',
-    center: 'main',
+    programType: 'prog-1',
+    center: 'center-1',
   },
   {
     userId: 'std-3',
@@ -105,8 +156,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'extension',
-    center: 'jigjiga',
+    programType: 'prog-2',
+    center: 'center-3',
   },
   {
     userId: 'std-4',
@@ -117,8 +168,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'extension',
-    center: 'jigjiga',
+    programType: 'prog-2',
+    center: 'center-3',
   },
   {
     userId: 'std-5',
@@ -129,8 +180,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'regular',
-    center: 'main',
+    programType: 'prog-1',
+    center: 'center-1',
   },
   {
     userId: 'std-6',
@@ -141,8 +192,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'regular',
-    center: 'main',
+    programType: 'prog-1',
+    center: 'center-1',
   },
   {
     userId: 'std-7',
@@ -153,8 +204,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'regular',
-    center: 'main',
+    programType: 'prog-1',
+    center: 'center-1',
   },
   {
     userId: 'std-8',
@@ -165,8 +216,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'extension',
-    center: 'harer',
+    programType: 'prog-2',
+    center: 'center-2',
   },
   {
     userId: 'std-9',
@@ -177,8 +228,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'extension',
-    center: 'harer',
+    programType: 'prog-2',
+    center: 'center-2',
   },
   {
     userId: 'std-10',
@@ -189,8 +240,8 @@ export const MOCK_USERS: User[] = [
     department: 'Computer Science',
     createdAt: new Date().toISOString(),
     isActive: true,
-    programType: 'regular',
-    center: 'main',
+    programType: 'prog-1',
+    center: 'center-1',
   },
   // Admin & QA
   {
@@ -312,8 +363,8 @@ export const MOCK_SECTIONS: Section[] = [
     instructorId: 'inst-1',
     semesterId: 'sem-1',
     room: 'Block 24, Room 102',
-    programType: 'regular',
-    center: 'main',
+    programType: 'prog-1',
+    center: 'center-1',
     startDate: '2026-09-01',
     endDate: '2027-01-15',
     schedule: [
@@ -329,8 +380,8 @@ export const MOCK_SECTIONS: Section[] = [
     instructorId: 'inst-2',
     semesterId: 'sem-1',
     room: 'Block 24, Room 205',
-    programType: 'extension',
-    center: 'jigjiga',
+    programType: 'prog-2',
+    center: 'center-3',
     startDate: '2026-09-01',
     endDate: '2027-01-15',
     schedule: [
@@ -348,8 +399,8 @@ export const MOCK_SECTIONS: Section[] = [
     instructorId: 'inst-3',
     semesterId: 'sem-1',
     room: 'Block 24, Room 301',
-    programType: 'regular',
-    center: 'main',
+    programType: 'prog-1',
+    center: 'center-1',
     startDate: '2026-09-01',
     endDate: '2027-01-15',
     schedule: [

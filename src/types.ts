@@ -4,7 +4,7 @@
  */
 
 export type UserRole = 'student' | 'instructor' | 'admin' | 'qa';
-export type ProgramType = 'regular' | 'extension';
+export type ProgramType = string; // Changed from union to string to support dynamic programs
 export type Center = string;
 export type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
 
@@ -13,6 +13,23 @@ export interface CenterInfo {
   name: string;
   location?: string;
   description?: string;
+  createdAt: string;
+}
+
+export interface ProgramInfo {
+  programId: string;
+  name: string;
+  durationYears: number;
+  description?: string;
+  createdAt: string;
+}
+
+export interface BatchInfo {
+  batchId: string;
+  name: string; // e.g., "Year 3 (2015 Entry)"
+  entryYear: string;
+  currentYear: number;
+  expectedGraduation: string;
   createdAt: string;
 }
 
@@ -68,6 +85,7 @@ export interface Section {
   room: string;
   programType: ProgramType;
   center: Center;
+  batchId?: string;
   startDate: string;
   endDate: string;
   schedule: ScheduleBlock[];
@@ -107,7 +125,7 @@ export interface Attendance {
 export interface AuditLog {
   logId: string;
   action: 'CREATE' | 'UPDATE' | 'DELETE';
-  entityType: 'USER' | 'COURSE' | 'SECTION' | 'SEMESTER' | 'CENTER';
+  entityType: 'USER' | 'COURSE' | 'SECTION' | 'SEMESTER' | 'CENTER' | 'PROGRAM' | 'BATCH';
   entityId: string;
   entityName: string;
   performedBy: string;
