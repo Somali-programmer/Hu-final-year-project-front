@@ -719,7 +719,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                     contentStyle={{ 
                       borderRadius: '16px', 
                       border: 'none', 
-                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', 
+                      boxShadow: 'var(--chart-tooltip-shadow)', 
                       fontSize: '12px', 
                       fontWeight: 700,
                       backgroundColor: 'var(--surface)',
@@ -851,7 +851,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                 <select 
                   value={filterCenter}
                   onChange={(e) => setFilterCenter(e.target.value as any)}
-                  className="px-4 py-2 bg-white border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all shadow-sm"
+                  className="px-4 py-2 bg-brand-bg dark:bg-brand-surface border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all shadow-sm"
                 >
                   <option value="all">All Centers</option>
                   {centers.map(c => (
@@ -864,7 +864,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                 <select 
                   value={filterProgram}
                   onChange={(e) => setFilterProgram(e.target.value as any)}
-                  className="px-4 py-2 bg-white border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all shadow-sm"
+                  className="px-4 py-2 bg-brand-bg dark:bg-brand-surface border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all shadow-sm"
                 >
                   <option value="all">All Programs</option>
                   {programs.map(p => (
@@ -877,7 +877,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                 <select 
                   value={filterBatch}
                   onChange={(e) => setFilterBatch(e.target.value)}
-                  className="px-4 py-2 bg-white border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all shadow-sm"
+                  className="px-4 py-2 bg-brand-bg dark:bg-brand-surface border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all shadow-sm"
                 >
                   <option value="all">All Batches</option>
                   {batches.map(b => (
@@ -888,7 +888,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               <div className="ml-auto flex items-center gap-3">
                 <button 
                   onClick={() => setIsImportModalOpen(true)}
-                  className="px-4 py-2 bg-hu-charcoal text-white dark:text-hu-charcoal rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all shadow-md flex items-center gap-2"
+                  className="px-4 py-2 bg-white text-hu-charcoal rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-hu-gold transition-all shadow-md flex items-center gap-2"
                 >
                   <Upload className="w-3.5 h-3.5" />
                   Import Students
@@ -1761,7 +1761,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
               <div className="p-4 md:p-6 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
                 <h3 className="text-xl md:text-2xl font-serif font-bold text-brand-text">
@@ -1908,9 +1908,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
+              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30 dark:bg-brand-surface/20">
                 <h3 className="text-2xl font-serif font-bold text-brand-text">
                   {editingCourse ? 'Edit Course' : 'Add New Course'}
                 </h3>
@@ -2001,13 +2001,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
+              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30 dark:bg-brand-surface/20">
                 <h3 className="text-2xl font-serif font-bold text-brand-text">
                   {editingSection ? 'Edit Section Assignment' : 'Assign New Section'}
                 </h3>
-                <button onClick={() => setIsSectionModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-all">
+                <button onClick={() => setIsSectionModalOpen(false)} className="p-2 hover:bg-brand-bg rounded-xl transition-all">
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
@@ -2042,13 +2042,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Room</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-brand-muted">Room</label>
                     <input
                       required
                       type="text"
                       value={sectionForm.room || ''}
                       onChange={(e) => setSectionForm({ ...sectionForm, room: e.target.value })}
-                      className="w-full px-6 py-4 bg-brand-bg border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                      className="w-full px-6 py-4 bg-brand-bg dark:bg-brand-bg/50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
                       placeholder="e.g. Block 24, Room 102"
                     />
                   </div>
@@ -2147,7 +2147,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                   </div>
 
                   {sectionForm.schedule?.map((block, index) => (
-                    <div key={index} className="flex items-center gap-4 bg-brand-bg p-4 rounded-xl">
+                    <div key={index} className="grid grid-cols-2 md:grid-cols-4 items-center gap-2 bg-brand-bg dark:bg-brand-surface/50 p-3 rounded-xl">
                       <select
                         value={block.dayOfWeek || 'Monday'}
                         onChange={(e) => {
@@ -2155,7 +2155,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                           newSchedule[index].dayOfWeek = e.target.value as DayOfWeek;
                           setSectionForm({ ...sectionForm, schedule: newSchedule });
                         }}
-                        className="flex-1 px-4 py-2 bg-white border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                        className="col-span-2 md:col-span-1 px-3 py-2 bg-brand-bg dark:bg-brand-surface border-none rounded-lg text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all dark:text-brand-text"
                       >
                         {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
                           <option key={day} value={day}>{day}</option>
@@ -2169,9 +2169,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                           newSchedule[index].startTime = e.target.value;
                           setSectionForm({ ...sectionForm, schedule: newSchedule });
                         }}
-                        className="w-32 px-4 py-2 bg-white border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                        className="col-span-1 px-3 py-2 bg-brand-bg dark:bg-brand-surface border-none rounded-lg text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all dark:text-brand-text"
                       />
-                      <span className="text-gray-400 font-bold">-</span>
                       <input
                         type="time"
                         value={block.endTime || ''}
@@ -2180,7 +2179,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                           newSchedule[index].endTime = e.target.value;
                           setSectionForm({ ...sectionForm, schedule: newSchedule });
                         }}
-                        className="w-32 px-4 py-2 bg-white border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                        className="col-span-1 px-3 py-2 bg-brand-bg dark:bg-brand-surface border-none rounded-lg text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all dark:text-brand-text"
                       />
                       <button
                         type="button"
@@ -2189,7 +2188,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                           newSchedule.splice(index, 1);
                           setSectionForm({ ...sectionForm, schedule: newSchedule });
                         }}
-                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                        className="col-span-1 md:col-span-1 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -2504,13 +2503,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
+              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30 dark:bg-brand-surface/20">
                 <h3 className="text-2xl font-serif font-bold text-brand-text">
                   Add New Semester
                 </h3>
-                <button onClick={() => setIsSemesterModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-all">
+                <button onClick={() => setIsSemesterModalOpen(false)} className="p-2 hover:bg-brand-bg rounded-xl transition-all">
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
@@ -2555,7 +2554,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                       onChange={(e) => setSemesterForm({ ...semesterForm, isActive: e.target.checked })}
                       className="w-5 h-5 rounded border-brand-border text-brand-primary focus:ring-brand-primary"
                     />
-                    <label htmlFor="isActiveSemester" className="text-sm font-bold text-gray-700 cursor-pointer">
+                    <label htmlFor="isActiveSemester" className="text-sm font-bold text-brand-text cursor-pointer">
                       Set as Active Semester
                     </label>
                   </div>
@@ -2596,13 +2595,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
+              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30 dark:bg-brand-surface/20">
                 <h3 className="text-2xl font-serif font-bold text-brand-text">
                   {editingCenter ? 'Edit Center' : 'Add New Center'}
                 </h3>
-                <button onClick={() => setIsCenterModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-all">
+                <button onClick={() => setIsCenterModalOpen(false)} className="p-2 hover:bg-brand-bg rounded-xl transition-all">
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
@@ -2670,13 +2669,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
+              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30 dark:bg-brand-surface/20">
                 <h3 className="text-2xl font-serif font-bold text-brand-text">
                   {editingProgram ? 'Edit Program' : 'Add New Program'}
                 </h3>
-                <button onClick={() => setIsProgramModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-all">
+                <button onClick={() => setIsProgramModalOpen(false)} className="p-2 hover:bg-brand-bg rounded-xl transition-all">
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
@@ -2746,13 +2745,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
+              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30 dark:bg-brand-surface/20">
                 <h3 className="text-2xl font-serif font-bold text-brand-text">
                   {editingBatch ? 'Edit Batch' : 'Add New Batch'}
                 </h3>
-                <button onClick={() => setIsBatchModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-all">
+                <button onClick={() => setIsBatchModalOpen(false)} className="p-2 hover:bg-brand-bg rounded-xl transition-all">
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
@@ -2840,7 +2839,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
               <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
                 <div className="flex items-center gap-4">
@@ -2852,7 +2851,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                     <p className="text-xs text-gray-400 font-medium">Upload CSV file to enroll multiple students at once.</p>
                   </div>
                 </div>
-                <button onClick={() => setIsImportModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-all">
+                <button onClick={() => setIsImportModalOpen(false)} className="p-2 hover:bg-brand-bg rounded-xl transition-all">
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
@@ -2861,7 +2860,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                 {/* Template Download */}
                 <div className="p-6 bg-brand-surface rounded-xl border border-hu-gold/10 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-hu-gold shadow-sm">
+                    <div className="w-10 h-10 bg-brand-bg dark:bg-brand-surface rounded-xl flex items-center justify-center text-hu-gold shadow-sm">
                       <Download className="w-5 h-5" />
                     </div>
                     <div>
@@ -2871,7 +2870,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                   </div>
                   <button 
                     onClick={handleDownloadTemplate}
-                    className="px-4 py-2 bg-white text-hu-gold border border-hu-gold/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-hu-gold hover:text-white dark:text-hu-charcoal transition-all"
+                    className="px-4 py-2 bg-brand-bg dark:bg-brand-surface text-hu-gold border border-hu-gold/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-hu-gold hover:text-white dark:hover:text-hu-charcoal transition-all"
                   >
                     Download
                   </button>
@@ -2886,7 +2885,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   <div className="border-2 border-dashed border-brand-border rounded-[32px] p-12 text-center space-y-4 hover:border-brand-primary/30 transition-all bg-brand-bg">
-                    <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-sm text-gray-300">
+                    <div className="w-16 h-16 bg-brand-bg dark:bg-brand-surface rounded-3xl flex items-center justify-center mx-auto shadow-sm text-gray-300">
                       <Upload className="w-8 h-8" />
                     </div>
                     <div>

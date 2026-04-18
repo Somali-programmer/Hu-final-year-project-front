@@ -48,6 +48,7 @@
   --card-stroke-hover: #32CD32; /* HU Green Stroke on Hover */
   --card-shadow: var(--shadow-hu-elevate-2);
   --card-shadow-hover: 0 20px 25px -5px rgba(50, 205, 50, 0.15), 0 8px 10px -6px rgba(0, 86, 150, 0.1); /* Lift with Green & Blue hints */
+  --chart-tooltip-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
 }
 
 .dark {
@@ -67,6 +68,7 @@
   --card-stroke-hover: #EF4444; /* Red Stroke Hover */
   --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 4px 10px -3px rgba(0, 0, 0, 0.8); /* Visible deep shadow at rest */
   --card-shadow-hover: 0 25px 45px -10px rgba(255, 184, 28, 0.35), 0 0 25px rgba(255, 184, 28, 0.15); /* sunshine gold shadow */
+  --chart-tooltip-shadow: 0 10px 15px -3px rgba(255, 184, 28, 0.2);
 }
 
 @layer components {
@@ -110,7 +112,7 @@
   }
 
   .hu-input {
-    @apply w-full px-5 py-3 bg-brand-bg border border-brand-border rounded-xl text-brand-text focus:bg-brand-surface focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 outline-none transition-all duration-200;
+    @apply w-full px-5 py-3 bg-brand-bg border border-brand-border rounded-xl text-brand-text focus:bg-brand-surface focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 outline-none transition-all duration-200 dark:bg-brand-surface;
   }
 
   .hu-label {

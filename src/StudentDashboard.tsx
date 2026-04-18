@@ -216,7 +216,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ view = 'overview' }
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {[
               { label: 'Overall Attendance', value: `${attendancePercentage}%`, icon: TrendingUp, color: isAtRisk ? 'text-red-500' : 'text-brand-primary', bg: isAtRisk ? 'bg-red-50' : 'bg-brand-primary/10' },
-              { label: 'Sessions Attended', value: attendanceHistory.length, icon: CheckCircle2, color: 'text-brand-text', bg: 'bg-brand-bg' },
+              { label: 'Sessions Attended', value: attendanceHistory.length, icon: CheckCircle2, color: 'text-green-600 dark:text-hu-gold', bg: 'bg-green-100 dark:bg-hu-gold/10' },
               { label: 'Active Sessions', value: activeSessions.length, icon: CalendarDays, color: 'text-brand-primary', bg: 'bg-brand-primary/10' }
             ].map((stat, i) => (
               <motion.div

@@ -387,8 +387,8 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
               
               return [
                 { label: 'Total Students', value: uniqueStudents.toString(), icon: Users, color: 'text-brand-primary', bg: 'bg-brand-primary/10' },
-                { label: 'Avg. Attendance', value: '92%', icon: BarChart3, color: 'text-hu-gold', bg: 'bg-hu-gold/10' },
-                { label: 'Active Sections', value: sections.length, icon: CalendarDays, color: 'text-brand-text', bg: 'bg-gray-100' }
+                { label: 'Avg. Attendance', value: '92%', icon: BarChart3, color: 'text-green-600 dark:text-hu-gold', bg: 'bg-green-100 dark:bg-hu-gold/10' },
+                { label: 'Active Sections', value: sections.length, icon: CalendarDays, color: 'text-green-600 dark:text-hu-gold', bg: 'bg-green-100 dark:bg-hu-gold/10' }
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -419,7 +419,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#9ca3af' }} />
                   <Tooltip 
                     cursor={{ fill: '#f9fafb' }}
-                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 700 }}
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: 'var(--chart-tooltip-shadow)', fontSize: '12px', fontWeight: 700 }}
                   />
                   <Bar dataKey="attendance" radius={[10, 10, 0, 0]}>
                     {sessionStats.map((entry, index) => (
@@ -537,14 +537,14 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                 <select
                   value={selectedSection}
                   onChange={(e) => setSelectedSection(e.target.value)}
-                  className="w-full pl-6 pr-12 py-4 bg-white border border-brand-border rounded-xl font-bold text-sm text-brand-text appearance-none focus:border-brand-primary focus:ring-0 outline-none transition-all shadow-sm"
+                  className="w-full pl-6 pr-12 py-4 bg-brand-bg dark:bg-brand-surface border border-brand-border rounded-xl font-bold text-sm text-brand-text dark:text-gray-100 appearance-none focus:border-brand-primary focus:ring-0 outline-none transition-all shadow-sm"
                 >
                   {sections.map((s) => {
                     const center = centers.find(c => c.centerId === s.center);
                     const programName = programs.find(p => p.programId === s.programType)?.name || s.programType;
                     return (
-                      <option key={s.sectionId} value={s.sectionId}>
-                        {s.room} • {center?.name || s.center.toUpperCase()} ({programName})
+                        <option key={s.sectionId} value={s.sectionId}>
+                        {s.room} • {s.sectionId.split('-')[1]} • {courses.find(c => c.courseId === s.courseId)?.title} • {center?.name || s.center.toUpperCase()} ({programName})
                       </option>
                     );
                   })}
@@ -731,7 +731,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
               </div>
             </div>
 
-            <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 bg-white">
+            <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 bg-brand-surface">
               {[
                 { label: 'Present', value: liveAttendance.length, color: 'text-brand-primary' },
                 { label: 'Late Arrival', value: '0', color: 'text-brand-text/40' },
@@ -1135,7 +1135,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                             <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 600, fill: '#9ca3af' }} />
                             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 600, fill: '#9ca3af' }} />
                             <Tooltip 
-                              contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                              contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: 'var(--chart-tooltip-shadow)', fontSize: '12px' }}
                               cursor={{ fill: '#f9fafb' }}
                             />
                             <Bar dataKey="present" name="Present" fill="#1e3a3a" radius={[4, 4, 0, 0]} />
@@ -1410,12 +1410,12 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-3xl bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            className="relative w-full max-w-3xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
           >
-            <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30 shrink-0">
+            <div className="p-8 border-b border-brand-border flex items-center justify-between bg-brand-surface/50 shrink-0">
               <div>
                 <h3 className="text-2xl font-serif font-bold text-brand-text">Class Roster</h3>
-                <p className="text-sm text-gray-400 font-medium mt-1">
+                <p className="text-sm text-brand-muted font-medium mt-1">
                   {(() => {
                     const section = sections.find(s => s.sectionId === rosterSectionId);
                     const course = courses.find(c => c.courseId === section?.courseId);
@@ -1423,15 +1423,15 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                   })()}
                 </p>
               </div>
-              <button onClick={() => setIsRosterModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-400"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              <button onClick={() => setIsRosterModalOpen(false)} className="p-2 hover:bg-brand-bg rounded-xl transition-all">
+                <X className="w-5 h-5 text-brand-muted" />
               </button>
             </div>
             
             <div className="overflow-y-auto p-0">
               <table className="w-full text-left">
-                <thead className="sticky top-0 bg-white shadow-sm z-10">
-                  <tr className="bg-brand-surface">
+                <thead className="sticky top-0 bg-brand-surface shadow-sm z-10">
+                  <tr className="bg-brand-surface/90">
                     <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Student</th>
                     <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">ID Number</th>
                     <th className="px-8 py-6 text-[11px] uppercase tracking-[0.2em] font-bold text-brand-muted whitespace-nowrap">Department</th>
@@ -1618,12 +1618,12 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl overflow-hidden"
+              className="relative w-full max-w-2xl bg-brand-surface rounded-[32px] shadow-2xl overflow-hidden"
             >
-              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-hu-cream/30">
+              <div className="p-8 border-b border-brand-border flex items-center justify-between bg-brand-surface/50">
                 <h3 className="text-2xl font-serif font-bold text-brand-text">Edit Section Schedule</h3>
-                <button onClick={() => setIsScheduleModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-all">
-                  <X className="w-5 h-5 text-gray-400" />
+                <button onClick={() => setIsScheduleModalOpen(false)} className="p-2 hover:bg-brand-bg rounded-xl transition-all">
+                  <X className="w-5 h-5 text-brand-muted" />
                 </button>
               </div>
               <div className="p-8 space-y-6">
@@ -1655,7 +1655,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                   </div>
 
                   {tempSchedule.map((block, index) => (
-                    <div key={index} className="flex items-center gap-4 bg-brand-bg p-4 rounded-xl">
+                    <div key={index} className="flex items-center gap-4 bg-brand-bg dark:bg-brand-surface p-4 rounded-xl">
                       <select
                         value={block.dayOfWeek}
                         onChange={(e) => {
@@ -1663,7 +1663,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                           newSchedule[index].dayOfWeek = e.target.value as DayOfWeek;
                           setTempSchedule(newSchedule);
                         }}
-                        className="flex-1 px-4 py-2 bg-white border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                        className="flex-1 px-4 py-2 bg-brand-bg dark:bg-brand-surface border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all dark:text-brand-text"
                       >
                         {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
                           <option key={day} value={day}>{day}</option>
@@ -1677,7 +1677,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                           newSchedule[index].startTime = e.target.value;
                           setTempSchedule(newSchedule);
                         }}
-                        className="w-32 px-4 py-2 bg-white border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                        className="w-32 px-4 py-2 bg-brand-bg dark:bg-brand-surface border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all dark:text-brand-text"
                       />
                       <span className="text-gray-400 font-bold">-</span>
                       <input
@@ -1688,7 +1688,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
                           newSchedule[index].endTime = e.target.value;
                           setTempSchedule(newSchedule);
                         }}
-                        className="w-32 px-4 py-2 bg-white border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                        className="w-32 px-4 py-2 bg-brand-bg dark:bg-brand-surface border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all dark:text-brand-text"
                       />
                       <button
                         type="button"
