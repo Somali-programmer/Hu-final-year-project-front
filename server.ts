@@ -3,6 +3,7 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import { supabaseAdmin } from './server/db/supabase';
 
 dotenv.config();
 
@@ -16,10 +17,19 @@ async function startServer() {
   app.use(express.json());
 
   // API Routes
-  app.get('/api/health', (req, res) => {
+  app.get('/api/health', async (req, res) => {
+    let dbStatus = 'disconnected';
+    try {
+      const { data, error } = await supabaseAdmin.from('departments').select('count', { count: 'exact', head: true });
+      if (!error) dbStatus = 'connected';
+    } catch (err) {
+      dbStatus = 'error';
+    }
+
     res.json({ 
       status: 'success', 
-      message: 'Haramaya University Attendance System API is online',
+      service: 'Haramaya University Attendance System API',
+      database: dbStatus,
       timestamp: new Date().toISOString()
     });
   });
