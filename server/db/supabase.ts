@@ -3,12 +3,12 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-let supabaseUrl = process.env.SUPABASE_URL || '';
+let supabaseUrl = (process.env.SUPABASE_URL || '').trim();
 // Ensure https protocol
 if (supabaseUrl && !supabaseUrl.startsWith('http')) {
   supabaseUrl = `https://${supabaseUrl}`;
 }
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseServiceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('❌ Supabase credentials missing! Database operations will fail.');
