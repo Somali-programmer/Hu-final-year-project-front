@@ -59,22 +59,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-      const data = await res.json();
       
-      if (data.success) {
-        localStorage.setItem('hu_token', data.token);
-        setUser(data.user);
-        setLoading(false);
-        return { success: true };
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await res.json();
+        
+        if (data.success) {
+          localStorage.setItem('hu_token', data.token);
+          setUser(data.user);
+          setLoading(false);
+          return { success: true };
+        } else {
+          setLoading(false);
+          return { success: false, message: data.message };
+        }
       } else {
+        const text = await res.text();
         setLoading(false);
-        return { success: false, message: data.message };
+        console.error('Non-JSON response:', text);
+        return { 
+          success: false, 
+          message: `Server Error (${res.status}): The server returned an unexpected response format. This may happen if the backend server failed or is not configured properly.`
+        };
       }
     } catch (err) {
       setLoading(false);
       console.error('Login request failed:', err);
       const errorMessage = err instanceof Error ? err.message : String(err);
-      return { success: false, message: `Connection error: ${errorMessage}` };
+      return { success: false, message: `Network error: ${errorMessage}` };
     }
   };
 

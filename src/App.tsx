@@ -56,6 +56,23 @@ const DashboardRouter: React.FC<{ view?: string }> = ({ view = 'overview' }) => 
 };
 
 export default function App() {
+  React.useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const res = await fetch('/api/health');
+        if (res.ok) {
+          const data = await res.json();
+          console.log('✅ Backend Connection verified:', data);
+        } else {
+          console.error('❌ Backend health check failed:', res.status, res.statusText);
+        }
+      } catch (err) {
+        console.error('❌ Could not connect to backend:', err);
+      }
+    };
+    checkHealth();
+  }, []);
+
   return (
     <ErrorBoundary>
       <AppDataProvider>

@@ -62,31 +62,32 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const syncWithServer = async () => {
     try {
-      const [uRes, cRes, pRes, bRes, eRes, sRes, coRes, semRes, sessRes, attRes] = await Promise.all([
-        fetch('/api/users'),
-        fetch('/api/centers'),
-        fetch('/api/programs'),
-        fetch('/api/batches'),
-        fetch('/api/enrollments'),
-        fetch('/api/sections'),
-        fetch('/api/courses'),
-        fetch('/api/semesters'),
-        fetch('/api/sessions'),
-        fetch('/api/attendance')
-      ]);
+      const endpoints = [
+        '/api/users', '/api/centers', '/api/programs', '/api/batches', 
+        '/api/enrollments', '/api/sections', '/api/courses', 
+        '/api/semesters', '/api/sessions', '/api/attendance'
+      ];
 
-      const [uData, cData, pData, bData, eData, sData, coData, semData, sessData, attData] = await Promise.all([
-        uRes.json(),
-        cRes.json(),
-        pRes.json(),
-        bRes.json(),
-        eRes.json(),
-        sRes.json(),
-        coRes.json(),
-        semRes.json(),
-        sessRes.json(),
-        attRes.json()
-      ]);
+      const responses = await Promise.all(endpoints.map(url => fetch(url)));
+      
+      const results = await Promise.all(responses.map(async (res, index) => {
+        if (!res.ok) {
+          console.warn(`Failed to fetch ${endpoints[index]}: ${res.status}`);
+          return null;
+        }
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          try {
+            return await res.json();
+          } catch (e) {
+            console.error(`Error parsing JSON from ${endpoints[index]}:`, e);
+            return null;
+          }
+        }
+        return null;
+      }));
+
+      const [uData, cData, pData, bData, eData, sData, coData, semData, sessData, attData] = results;
 
       if (Array.isArray(uData)) setUsers(uData);
       if (Array.isArray(cData)) setCenters(cData);
