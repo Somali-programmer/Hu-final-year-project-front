@@ -2,11 +2,11 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { supabaseAdmin } from './server/db/supabase.ts';
+import { supabaseAdmin } from './server/db/supabase';
 
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { bulkRegisterStudents } from './server/services/import.service.ts';
+import { bulkRegisterStudents } from './server/services/import.service';
 
 dotenv.config();
 
@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 const JWT_SECRET = process.env.JWT_SECRET || 'hu-default-secret';
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
 
