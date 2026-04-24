@@ -51,7 +51,7 @@ const Footer: React.FC = () => {
           © {new Date().getFullYear()} Haramaya University. All Rights Reserved.
         </p>
         <div className="flex items-center gap-6">
-          <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest">V2.1.0-STABLE</p>
+          <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest">V2.2.0-STABLE</p>
           <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
           <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">System Online</span>
         </div>
