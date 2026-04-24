@@ -17,7 +17,7 @@ interface StudentDashboardProps {
 const StudentDashboard: React.FC<StudentDashboardProps> = ({ view = 'overview' }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { sessions, attendance, sections, enrollments, semesters, addAttendance, centers, courses, programs } = useAppData();
+  const { sessions, attendance, sections, enrollments, semesters, addAttendance, centers, courses, programs, batches } = useAppData();
   const [activeSessions, setActiveSessions] = useState<(ClassSession & { section?: Section })[]>([]);
   const [attendanceHistory, setAttendanceHistory] = useState<Attendance[]>([]);
   const [token, setToken] = useState('');
