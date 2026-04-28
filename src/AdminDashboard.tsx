@@ -237,7 +237,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
     schedule: [],
     meetingDates: [],
     midExamDates: [],
-    finalExamDates: []
+    finalExamDates: [],
+    geofenceCenter: { latitude: 9.4121, longitude: 42.0366 },
+    geofenceRadius: 100,
+    coursePolicy: ''
   });
 
   const [semesterForm, setSemesterForm] = useState<Partial<Semester>>({
@@ -2611,6 +2614,61 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                   </div>
                 </div>
 
+                <div className="space-y-6 pt-6 border-t border-brand-border">
+                  <h4 className="text-sm font-serif font-bold text-brand-text flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-brand-primary" /> Smart Geofencing Config
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Center Latitude</label>
+                      <input
+                        type="number"
+                        step="0.000001"
+                        value={sectionForm.geofenceCenter?.latitude || 0}
+                        onChange={(e) => setSectionForm({
+                          ...sectionForm,
+                          geofenceCenter: { ...sectionForm.geofenceCenter!, latitude: parseFloat(e.target.value) }
+                        })}
+                        className="w-full px-6 py-4 bg-brand-bg border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Center Longitude</label>
+                      <input
+                        type="number"
+                        step="0.000001"
+                        value={sectionForm.geofenceCenter?.longitude || 0}
+                        onChange={(e) => setSectionForm({
+                          ...sectionForm,
+                          geofenceCenter: { ...sectionForm.geofenceCenter!, longitude: parseFloat(e.target.value) }
+                        })}
+                        className="w-full px-6 py-4 bg-brand-bg border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Radius (Meters)</label>
+                      <input
+                        type="number"
+                        value={sectionForm.geofenceRadius || 100}
+                        onChange={(e) => setSectionForm({
+                          ...sectionForm,
+                          geofenceRadius: parseInt(e.target.value)
+                        })}
+                        className="w-full px-6 py-4 bg-brand-bg border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Course Policy / Rules</label>
+                    <textarea
+                      value={sectionForm.coursePolicy || ''}
+                      onChange={(e) => setSectionForm({ ...sectionForm, coursePolicy: e.target.value })}
+                      placeholder="e.g. 75% attendance required for final exam eligibility. Late submission policy..."
+                      className="w-full px-6 py-4 bg-brand-bg border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all min-h-[100px]"
+                    />
+                  </div>
+                </div>
+
                 <div className="pt-4 flex gap-4">
                   <button
                     type="button"
@@ -2749,6 +2807,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                           {date}
                         </span>
                       )) : <p className="text-xs text-gray-400 italic">No specific dates set</p>}
+                    </div>
+                  </div>
+                )}
+
+                {/* Course Policy Section */}
+                {selectedSectionDetails.coursePolicy && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 text-brand-primary">
+                      <FileText className="w-5 h-5" />
+                      <h4 className="text-sm font-bold uppercase tracking-widest">Course Policy & Rules</h4>
+                    </div>
+                    <div className="bg-hu-cream/20 p-6 rounded-[24px] border border-brand-border">
+                      <p className="text-sm text-brand-text whitespace-pre-line leading-relaxed italic font-medium">
+                        "{selectedSectionDetails.coursePolicy}"
+                      </p>
                     </div>
                   </div>
                 )}
