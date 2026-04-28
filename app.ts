@@ -263,7 +263,7 @@ app.post('/api/auth/login', async (req, res) => {
 
   app.get('/api/batches', async (req, res) => {
     try {
-      const { data, error } = await supabaseAdmin.from('batches').select('*, programs(name)');
+      const { data, error } = await supabaseAdmin.from('batches').select('*, programs(name, id)');
       if (error) throw error;
       res.json(data.map((b: any) => ({
         batchId: b.id,
@@ -274,6 +274,7 @@ app.post('/api/auth/login', async (req, res) => {
         expectedGraduation: b.expected_graduation || '',
         programId: b.program_id,
         programName: b.programs?.name,
+        centerId: b.center_id,
         createdAt: b.created_at
       })));
     } catch (err) {
@@ -407,7 +408,7 @@ app.post('/api/auth/login', async (req, res) => {
   // Batches
   app.post('/api/batches', async (req, res) => {
     try {
-      const { name, entryYear, currentYear, currentSemester, expectedGraduation, programId } = req.body;
+      const { name, entryYear, currentYear, currentSemester, expectedGraduation, programId, centerId } = req.body;
       
       let finalProgramId = programId;
       if (!finalProgramId) {
@@ -423,7 +424,8 @@ app.post('/api/auth/login', async (req, res) => {
         current_year: currentYear,
         current_semester: currentSemester || 1,
         expected_graduation: expectedGraduation,
-        program_id: finalProgramId
+        program_id: finalProgramId,
+        center_id: centerId || null
       }).select().single();
       if (error) throw error;
       res.json(data);
@@ -440,7 +442,7 @@ app.post('/api/auth/login', async (req, res) => {
         return res.status(400).json({ error: 'Invalid Batch ID format' });
       }
 
-      const { name, entryYear, currentYear, currentSemester, expectedGraduation, programId } = req.body;
+      const { name, entryYear, currentYear, currentSemester, expectedGraduation, programId, centerId } = req.body;
       const updateData: any = {
         name,
         entry_year: entryYear ? parseInt(entryYear) : undefined,
@@ -449,6 +451,7 @@ app.post('/api/auth/login', async (req, res) => {
         expected_graduation: expectedGraduation
       };
       if (programId) updateData.program_id = programId;
+      if (centerId !== undefined) updateData.center_id = centerId || null;
 
       const { error } = await supabaseAdmin.from('batches').update(updateData).eq('id', id);
       if (error) throw error;

@@ -34,6 +34,8 @@ import Papa from 'papaparse';
 import AnalyticsCard from './components/AnalyticsCard';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, PieChart, Pie } from 'recharts';
 
+import toast from 'react-hot-toast';
+
 import { useNavigate } from 'react-router-dom';
 import { useAppData } from './AppDataContext';
 
@@ -69,7 +71,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
   }, []);
 
   const handleBackup = () => {
-    alert('System data backup initiated... (Mock Action)');
+    toast.success('System data backup initiated... (Mock Action)');
   };
 
   const handleDownloadTemplate = () => {
@@ -111,23 +113,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
 
   const processImport = async () => {
     if (importErrors.length > 0) {
-      alert("Please fix validation errors first.");
+      toast.error("Please fix validation errors first.");
       return;
     }
 
     if (departments.length === 0) {
-      alert("Department data not loaded. Please refresh.");
+      toast.error("Department data not loaded. Please refresh.");
       return;
     }
 
     setLoading(true);
+    if (!importDepartmentId && departments.length > 0) {
+      setImportDepartmentId(departments[0].id);
+    }
     try {
       const res = await fetch('/api/admin/students/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           students: importData,
-          departmentId: departments[0].id // Default to CS for now
+          departmentId: importDepartmentId || departments[0].id
         })
       });
 
@@ -143,7 +148,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           details: `Successfully imported ${result.success} students. Failed: ${result.failed}`
         });
 
-        alert(`Import Complete!\nSuccess: ${result.success}\nFailed: ${result.failed}${result.errors.length > 0 ? '\n\nErrors:\n' + result.errors.join('\n') : ''}`);
+        toast.success(`Import Complete!\nSuccess: ${result.success}\nFailed: ${result.failed}${result.errors.length > 0 ? '\n\nErrors:\n' + result.errors.join('\n') : ''}`);
         
         setIsImportModalOpen(false);
         setImportData([]);
@@ -152,17 +157,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
         // Refresh local data from server
         await syncWithServer();
       } else {
-        alert("Import failed: " + (result.error || "Unknown error"));
+        toast.error("Import failed: " + (result.error || "Unknown error"));
       }
     } catch (err) {
-      alert("Network error during import.");
+      toast.error("Network error during import.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDownloadDeptReport = (dept: string) => {
-    alert(`Generating department-level report for ${dept}... (Mock Download)`);
+    toast.success(`Generating department-level report for ${dept}... (Mock Download)`);
   };
 
   // Modal States
@@ -185,6 +190,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importData, setImportData] = useState<any[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
+  const [importDepartmentId, setImportDepartmentId] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [editingSection, setEditingSection] = useState<Section | null>(null);
@@ -243,7 +249,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
 
   const [centerForm, setCenterForm] = useState({ name: '', location: '', description: '' });
   const [programForm, setProgramForm] = useState({ name: '', durationYears: 4, description: '', departmentId: '' });
-  const [batchForm, setBatchForm] = useState({ name: '', entryYear: '', currentYear: 1, currentSemester: 1, expectedGraduation: '', programId: '' });
+  const [batchForm, setBatchForm] = useState({ name: '', entryYear: '', currentYear: 1, currentSemester: 1, expectedGraduation: '', programId: '', centerId: '' });
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,12 +284,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Created new ${newUser.role}`
         });
+        toast.success(`User ${newUser.fullName} created successfully`);
       }
       setIsUserModalOpen(false);
       setEditingUser(null);
       setUserForm({ fullName: '', email: '', role: 'student', department: 'Computer Science', idNumber: '', isActive: true });
     } catch (err: any) {
-      alert(err.message || "Failed to save user.");
+      toast.error(err.message || "Failed to save user.");
     } finally {
       setLoading(false);
     }
@@ -322,10 +329,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               details: `Advanced batch. Now Year ${newYear}, Sem ${newSemester}`
             });
           }
-          alert(`Success: ${eligibleBatches.length} cohorts have been advanced in their academic term.`);
+          toast.success(`Success: ${eligibleBatches.length} cohorts have been advanced in their academic term.`);
           await syncWithServer(); 
         } catch (err: any) {
-          alert('Error advancing terms: ' + err.message);
+          toast.error('Error advancing terms: ' + err.message);
         } finally {
           setIsConfirmModalOpen(false);
           setLoading(false);
@@ -374,6 +381,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Updated course ${courseForm.courseCode}`
         });
+        toast.success('Course updated successfully');
       } else {
         const newCourse: Course = {
           ...courseForm,
@@ -388,12 +396,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Created course ${newCourse.courseCode}`
         });
+        toast.success('Course added successfully');
       }
       setIsCourseModalOpen(false);
       setEditingCourse(null);
       setCourseForm({ courseCode: '', title: '', creditHours: 3, department: 'Computer Science' });
     } catch (err: any) {
-      alert(err.message || "Failed to save course.");
+      toast.error(err.message || "Failed to save course.");
     } finally {
       setLoading(false);
     }
@@ -447,10 +456,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
         details: `Created semester (Active: ${newSemester.isActive})`
       });
       
+      toast.success('Semester created successfully');
       setIsSemesterModalOpen(false);
       setSemesterForm({ name: '', startDate: '', endDate: '', isActive: false });
     } catch (err: any) {
-      alert(err.message || "Failed to save semester.");
+      toast.error(err.message || "Failed to save semester.");
     } finally {
       setLoading(false);
     }
@@ -470,6 +480,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Updated center ${centerForm.name}`
         });
+        toast.success('Center updated successfully');
       } else {
         const newCenter = {
           ...centerForm,
@@ -485,12 +496,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Created center ${newCenter.name}`
         });
+        toast.success('Center created successfully');
       }
       setIsCenterModalOpen(false);
       setCenterForm({ name: '', location: '', description: '' });
       setEditingCenter(null);
     } catch (err: any) {
-      alert(err.message || "Failed to save center.");
+      toast.error(err.message || "Failed to save center.");
     } finally {
       setLoading(false);
     }
@@ -510,6 +522,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Updated program ${programForm.name}`
         });
+        toast.success('Program updated successfully');
       } else {
         const newProgram: ProgramInfo = {
           ...programForm,
@@ -525,12 +538,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Created program ${newProgram.name}`
         });
+        toast.success('Program added successfully');
       }
       setIsProgramModalOpen(false);
       setProgramForm({ name: '', durationYears: 4, description: '', departmentId: '' });
       setEditingProgram(null);
     } catch (err: any) {
-      alert(err.message || "Failed to save program.");
+      toast.error(err.message || "Failed to save program.");
     } finally {
       setLoading(false);
     }
@@ -574,6 +588,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Updated batch ${batchForm.name}`
         });
+        toast.success('Batch updated successfully');
       } else {
         const newBatch: BatchInfo = {
           ...batchForm,
@@ -589,12 +604,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Created batch ${newBatch.name}`
         });
+        toast.success('Batch created successfully');
       }
       setIsBatchModalOpen(false);
-      setBatchForm({ name: '', entryYear: '', currentYear: 1, currentSemester: 1, expectedGraduation: '', programId: '' });
+      setBatchForm({ name: '', entryYear: '', currentYear: 1, currentSemester: 1, expectedGraduation: '', programId: '', centerId: '' });
       setEditingBatch(null);
     } catch (err: any) {
-      alert(err.message || "Failed to save batch.");
+      toast.error(err.message || "Failed to save batch.");
     } finally {
       setLoading(false);
     }
@@ -630,7 +646,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
     
     const activeSemester = semesters.find(s => s.isActive);
     if (!activeSemester) {
-      alert('CRITICAL ERROR: No active semester found. Please go to "System Settings" -> "Semesters" and set a semester as active before assigning sections.');
+      toast.error('CRITICAL ERROR: No active semester found. Please go to "System Settings" -> "Semesters" and set a semester as active before assigning sections.');
       return;
     }
 
@@ -645,7 +661,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
       const course = courses.find(c => c.courseId === sectionForm.courseId);
       const batch = batches.find(b => b.batchId === sectionForm.batchId);
       const semester = semesters.find(sem => sem.semesterId === existingEntry.semesterId);
-      alert(`Conflict Error: A section for "${course?.title}" and "${batch?.name || 'All Batches'}" was already assigned in ${semester?.name || 'the system'}. Repetitive course assignments for the same batch are prohibited.`);
+      toast.error(`Conflict Error: A section for "${course?.title}" and "${batch?.name || 'All Batches'}" was already assigned in ${semester?.name || 'the system'}. Repetitive course assignments for the same batch are prohibited.`);
       return;
     }
 
@@ -662,6 +678,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Updated section for course ${sectionForm.courseId}`
         });
+        toast.success('Section updated successfully');
       } else {
         const sectionId = `section-${Date.now()}`;
         const newSection: Section = {
@@ -683,13 +700,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           performedBy: currentUser?.fullName || 'Admin',
           details: `Created section for course ${newSection.courseId}`
         });
+        toast.success('Section assigned successfully');
       }
       setIsSectionModalOpen(false);
       setEditingSection(null);
       setSectionForm({ courseId: '', instructorId: '', room: '', programType: programs.length > 0 ? programs[0].programId : '', center: centers.length > 0 ? centers[0].centerId : '', startDate: '', endDate: '', schedule: [] });
     } catch (err: any) {
       console.error('Section save error:', err);
-      alert(`Failed to save section: ${err.message || 'Unknown error'}`);
+      toast.error(`Failed to save section: ${err.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -1415,7 +1433,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               <button 
                 onClick={() => {
                   setEditingBatch(null);
-                  setBatchForm({ name: '', entryYear: '', currentYear: 1, currentSemester: 1, expectedGraduation: '', programId: '' });
+                  setBatchForm({ name: '', entryYear: '', currentYear: 1, currentSemester: 1, expectedGraduation: '', programId: '', centerId: '' });
                   setIsBatchModalOpen(true);
                 }}
                 className="hu-button-rounded flex items-center gap-3"
@@ -1449,7 +1467,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                           currentYear: batch.currentYear, 
                           currentSemester: batch.currentSemester || 1,
                           expectedGraduation: batch.expectedGraduation,
-                          programId: batch.programId || ''
+                          programId: batch.programId || '',
+                          centerId: batch.centerId || ''
                         });
                         setIsBatchModalOpen(true);
                       }}
@@ -1480,6 +1499,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                     <span className="text-[10px] uppercase tracking-widest font-bold text-brand-primary block mb-1">Graduation</span>
                     <span className="text-sm font-bold text-brand-text">{batch.expectedGraduation}</span>
                   </div>
+                </div>
+
+                <div className="mb-6 space-y-2">
+                  <p className="text-xs text-brand-text"><span className="font-bold uppercase tracking-widest text-brand-primary text-[10px]">Program:</span> {programs.find(p => p.programId === batch.programId)?.name || 'Unknown'}</p>
+                  {batch.centerId && (
+                    <p className="text-xs text-brand-text"><span className="font-bold uppercase tracking-widest text-brand-primary text-[10px]">Center:</span> {centers.find(c => c.centerId === batch.centerId)?.name || 'Unknown'}</p>
+                  )}
                 </div>
                 
                 <div className="pt-6 border-t border-brand-border flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -2104,9 +2130,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-brand-primary/20"
+                    disabled={loading}
+                    className="flex-1 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-brand-primary/20 disabled:opacity-50"
                   >
-                    {editingUser ? 'Update Personnel' : 'Create Personnel'}
+                    {loading ? 'Processing...' : (editingUser ? 'Update Personnel' : 'Create Personnel')}
                   </button>
                 </div>
               </form>
@@ -2204,9 +2231,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-brand-primary/20"
+                    disabled={loading}
+                    className="flex-1 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-brand-primary/20 disabled:opacity-50"
                   >
-                    {editingCourse ? 'Update Course' : 'Create Course'}
+                    {loading ? 'Processing...' : (editingCourse ? 'Update Course' : 'Create Course')}
                   </button>
                 </div>
               </form>
@@ -2819,9 +2847,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-brand-primary/20"
+                    disabled={loading}
+                    className="flex-1 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-hu-gold transition-all shadow-xl shadow-brand-primary/20 disabled:opacity-50"
                   >
-                    Add Semester
+                    {loading ? 'Processing...' : 'Add Semester'}
                   </button>
                 </div>
               </form>
@@ -2896,9 +2925,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-8 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-brand-primary-dark shadow-lg shadow-brand-primary/20 transition-all"
+                    disabled={loading}
+                    className="flex-1 px-8 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-brand-primary-dark shadow-lg shadow-brand-primary/20 transition-all disabled:opacity-50"
                   >
-                    {editingCenter ? 'Update Center' : 'Create Center'}
+                    {loading ? 'Processing...' : (editingCenter ? 'Update Center' : 'Create Center')}
                   </button>
                 </div>
               </form>
@@ -2986,9 +3016,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-8 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-brand-primary-dark shadow-lg shadow-brand-primary/20 transition-all"
+                    disabled={loading}
+                    className="flex-1 px-8 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-brand-primary-dark shadow-lg shadow-brand-primary/20 transition-all disabled:opacity-50"
                   >
-                    {editingProgram ? 'Update Program' : 'Create Program'}
+                    {loading ? 'Processing...' : (editingProgram ? 'Update Program' : 'Create Program')}
                   </button>
                 </div>
               </form>
@@ -3082,6 +3113,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                     ))}
                   </select>
                 </div>
+                {programs.find(p => p.programId === batchForm.programId)?.name?.toLowerCase() === 'extension' && (
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Center</label>
+                    <select
+                      required
+                      value={batchForm.centerId || ''}
+                      onChange={(e) => setBatchForm({ ...batchForm, centerId: e.target.value })}
+                      className="w-full px-6 py-4 bg-brand-bg border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all appearance-none"
+                    >
+                      <option value="">Select Center</option>
+                      {centers.map(c => (
+                        <option key={c.centerId} value={c.centerId}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Expected Graduation Year</label>
                   <input
@@ -3103,9 +3150,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-8 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-brand-primary-dark shadow-lg shadow-brand-primary/20 transition-all"
+                    disabled={loading}
+                    className="flex-1 px-8 py-4 bg-brand-primary text-white dark:text-hu-charcoal rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-brand-primary-dark shadow-lg shadow-brand-primary/20 transition-all disabled:opacity-50"
                   >
-                    {editingBatch ? 'Update Batch' : 'Create Batch'}
+                    {loading ? 'Processing...' : (editingBatch ? 'Update Batch' : 'Create Batch')}
                   </button>
                 </div>
               </form>
@@ -3167,21 +3215,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                 </div>
 
                 {/* File Upload Area */}
-                <div className="relative">
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileSelect}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="border-2 border-dashed border-brand-border rounded-[32px] p-12 text-center space-y-4 hover:border-brand-primary/30 transition-all bg-brand-bg">
-                    <div className="w-16 h-16 bg-brand-bg dark:bg-brand-surface rounded-3xl flex items-center justify-center mx-auto shadow-sm text-gray-300">
-                      <Upload className="w-8 h-8" />
+                <div className="space-y-4">
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleFileSelect}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="border-2 border-dashed border-brand-border rounded-[32px] p-12 text-center space-y-4 hover:border-brand-primary/30 transition-all bg-brand-bg">
+                      <div className="w-16 h-16 bg-brand-bg dark:bg-brand-surface rounded-3xl flex items-center justify-center mx-auto shadow-sm text-gray-300">
+                        <Upload className="w-8 h-8" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-brand-text">Click or drag CSV file here</p>
+                        <p className="text-xs text-gray-400 mt-1">Maximum file size: 5MB</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-brand-text">Click or drag CSV file here</p>
-                      <p className="text-xs text-gray-400 mt-1">Maximum file size: 5MB</p>
-                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Target Department</label>
+                    <select
+                      value={importDepartmentId}
+                      onChange={(e) => setImportDepartmentId(e.target.value)}
+                      className="w-full px-6 py-4 bg-brand-bg border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-hu-gold/20 outline-none transition-all appearance-none"
+                    >
+                      {departments.map(d => (
+                        <option key={d.id} value={d.id}>{d.name}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

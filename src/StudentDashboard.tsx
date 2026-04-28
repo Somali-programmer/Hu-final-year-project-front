@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
 import { ClassSession, Attendance, Section } from './types';
 import { calculateDistance, cn } from './lib/utils';
@@ -57,7 +58,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ view = 'overview' }
     setSuccess('Preparing your detailed attendance report for download...');
     setTimeout(() => {
       setSuccess(null);
-      alert('Your attendance report (PDF) has been generated based on your real records.');
+      toast.success('Your attendance report (PDF) has been generated based on your real records.');
     }, 1500);
   };
 

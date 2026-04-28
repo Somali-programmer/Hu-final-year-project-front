@@ -8,6 +8,7 @@ import { cn } from './lib/utils';
 import { useAuth } from './AuthContext';
 import { menuItems } from './config/navigation';
 import ThemeToggle from './components/ThemeToggle';
+import { Toaster } from 'react-hot-toast';
 import { NotificationBell } from './components/NotificationBell';
 
 const policyContent: Record<string, { title: string, content: React.ReactNode }> = {
@@ -193,6 +194,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {children}
       </main>
 
+      <Toaster position="top-right" />
       <DashboardFooter onOpenModal={setActiveModal} />
 
       {/* Policy Modals */}

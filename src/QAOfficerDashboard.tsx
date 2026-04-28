@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
 import { Attendance, User, ClassSession } from './types';
 import { motion } from 'motion/react';
 import { ShieldCheck, TrendingUp, AlertCircle, CheckCircle2, Search, Filter, Download, BarChart3, History, ClipboardCheck, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from './lib/utils';
-import { MOCK_ATTENDANCE, MOCK_USER, MOCK_SESSIONS } from './mockData';
+import { useAppData } from './AppDataContext';
 import AnalyticsCard from './components/AnalyticsCard';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell } from 'recharts';
 
@@ -18,23 +19,14 @@ interface QAOfficerDashboardProps {
 const QAOfficerDashboard: React.FC<QAOfficerDashboardProps> = ({ view = 'overview' }) => {
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
-  const [attendance, setAttendance] = useState<Attendance[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [sessions, setSessions] = useState<ClassSession[]>([]);
-
-  useEffect(() => {
-    // Load mock data
-    setAttendance(MOCK_ATTENDANCE);
-    setUsers([MOCK_USER]);
-    setSessions(MOCK_SESSIONS);
-  }, []);
+  const { attendance, users, sessions } = useAppData();
 
   const handleApproveCorrection = (id: string) => {
-    alert(`Correction request ${id} approved. (Mock Action)`);
+    toast.success(`Correction request ${id} approved. (Mock Action)`);
   };
 
   const handleDownloadAudit = (type: string) => {
-    alert(`Downloading ${type} audit report... (Mock Download)`);
+    toast.success(`Downloading ${type} audit report... (Mock Download)`);
   };
 
   const studentsAtRisk = users.filter(u => {

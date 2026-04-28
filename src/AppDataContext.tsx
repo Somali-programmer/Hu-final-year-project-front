@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { User, Course, Section, ClassSession, Attendance, Semester, Enrollment, AuditLog, ProgramType, Center, CenterInfo, ProgramInfo, BatchInfo } from './types';
-import { MOCK_USERS, MOCK_COURSES, MOCK_SECTIONS, MOCK_SESSIONS, MOCK_ATTENDANCE, MOCK_SEMESTERS, MOCK_ENROLLMENTS, MOCK_CENTERS, MOCK_PROGRAMS, MOCK_BATCHES, MOCK_HISTORICAL_SECTIONS, MOCK_HISTORICAL_SEMESTERS } from './mockData';
 
 interface AppDataContextType {
   users: User[];
@@ -49,12 +48,12 @@ const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
 
 export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
-  const [sections, setSections] = useState<Section[]>([...MOCK_SECTIONS, ...MOCK_HISTORICAL_SECTIONS]);
-  const [sessions, setSessions] = useState<ClassSession[]>(MOCK_SESSIONS);
-  const [attendance, setAttendance] = useState<Attendance[]>(MOCK_ATTENDANCE);
-  const [semesters, setSemesters] = useState<Semester[]>([...MOCK_SEMESTERS, ...MOCK_HISTORICAL_SEMESTERS]);
-  const [enrollments, setEnrollments] = useState<Enrollment[]>(MOCK_ENROLLMENTS);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [sections, setSections] = useState<Section[]>([]);
+  const [sessions, setSessions] = useState<ClassSession[]>([]);
+  const [attendance, setAttendance] = useState<Attendance[]>([]);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [centers, setCenters] = useState<CenterInfo[]>([]);
   const [programs, setPrograms] = useState<ProgramInfo[]>([]);
@@ -412,7 +411,8 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
         currentYear: batch.currentYear,
         currentSemester: batch.currentSemester,
         expectedGraduation: batch.expectedGraduation,
-        programId: batch.programId
+        programId: batch.programId,
+        centerId: batch.centerId
       })
     });
     if (!res.ok) {

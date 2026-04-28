@@ -33,6 +33,7 @@ export interface BatchInfo {
   currentSemester?: number;
   expectedGraduation: string;
   programId?: string;
+  centerId?: string;
   createdAt: string;
 }
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
 import { ClassSession, Attendance, Section, User, ScheduleBlock, DayOfWeek } from './types';
 import { generateSessionToken, cn } from './lib/utils';
@@ -147,13 +148,13 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
         geofenceRadius: parseFloat(updates.radius)
       });
     }
-    alert(`Saved geofence for section ${sectionId}`);
+    toast.success(`Saved geofence for section ${sectionId}`);
     handleCancelGeofence(sectionId);
   };
 
   const handleSetCurrentLocation = (sectionId: string) => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser');
+      toast.error('Geolocation is not supported by your browser');
       return;
     }
 
@@ -170,7 +171,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
         }
       },
       (error) => {
-        alert(`Error getting location: ${error.message}`);
+        toast.error(`Error getting location: ${error.message}`);
       }
     );
   };
@@ -224,7 +225,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
       updateSection(sectionId, {
         coursePolicy: policy
       });
-      alert('Course policy updated successfully.');
+      toast.success('Course policy updated successfully.');
     }
   };
 
@@ -303,7 +304,7 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
       // Since we don't have a direct 'updateAttendance' in useAppData, we'll use updateSection or similar if it existed
       // But based on useAppData, we have attendance as a list.
       // Let's assume we can use a mock update for now or check if useAppData has it.
-      alert(`Updated ${studentId} to ${status}`);
+      toast.success(`Updated ${studentId} to ${status}`);
     } else {
       // Create new record
       const newRecord: Attendance = {
@@ -316,12 +317,12 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ view = 'overv
         distanceFromCenter: 0
       };
       // addAttendance(newRecord); // Assuming this exists in context
-      alert(`Marked ${studentId} as ${status}`);
+      toast.success(`Marked ${studentId} as ${status}`);
     }
   };
 
   const handleDownloadReport = (type: string) => {
-    alert(`Generating ${type} report... (Mock Download)`);
+    toast.success(`Generating ${type} report... (Mock Download)`);
   };
 
   const getSectionStats = (sectionId: string) => {
