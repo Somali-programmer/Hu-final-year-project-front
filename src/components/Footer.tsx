@@ -20,15 +20,21 @@ const Footer: React.FC = () => {
           <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-muted">System Resources</h4>
           <ul className="space-y-3">
             <li>
-              <Link to="/documentation" className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-brand-primary transition-colors">
+              <Link to="/docs/system" className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-brand-primary transition-colors">
                 <Book className="w-4 h-4" />
-                <span>Documentation</span>
+                <span>System Documentation</span>
               </Link>
             </li>
             <li>
-              <Link to="/architecture" className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-hu-gold transition-colors">
+              <Link to="/docs/architecture" className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-hu-gold transition-colors">
                 <Layers className="w-4 h-4" />
                 <span>System Architecture</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/docs/manual" className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-brand-primary transition-colors">
+                <Book className="w-4 h-4" />
+                <span>User Manual</span>
               </Link>
             </li>
           </ul>

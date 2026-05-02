@@ -10,8 +10,11 @@ import AdminDashboard from './AdminDashboard';
 import QAOfficerDashboard from './QAOfficerDashboard';
 import Profile from './Profile';
 import Landing from './pages/Landing';
-import Documentation from './pages/Documentation';
-import SystemArchitecture from './pages/SystemArchitecture';
+import DocumentationLayout from './pages/Docs/DocsLayout';
+import SystemDocumentation from './pages/Docs/SystemDocumentation';
+import Architecture from './pages/Docs/Architecture';
+import UserManual from './pages/Docs/UserManual';
+import ProjectProposal from './pages/Docs/ProjectProposal';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -136,8 +139,13 @@ export default function App() {
               <Route path="/student/attendance" element={<ProtectedRoute><Layout><StudentDashboard view="attendance" /></Layout></ProtectedRoute>} />
               <Route path="/student/schedule" element={<ProtectedRoute><Layout><StudentDashboard view="schedule" /></Layout></ProtectedRoute>} />
 
-              <Route path="/documentation" element={<Documentation />} />
-              <Route path="/architecture" element={<SystemArchitecture />} />
+              <Route path="/docs" element={<DocumentationLayout />}>
+                <Route index element={<Navigate to="/docs/system" replace />} />
+                <Route path="system" element={<SystemDocumentation />} />
+                <Route path="architecture" element={<Architecture />} />
+                <Route path="manual" element={<UserManual />} />
+                <Route path="proposal" element={<ProjectProposal />} />
+              </Route>
 
               <Route
                 path="/profile"

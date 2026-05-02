@@ -44,4 +44,5 @@ export const menuItems = [
   { name: 'Schedule', path: '/student/schedule', icon: Calendar, roles: ['student'] },
   // Common
   { name: 'Profile', path: '/profile', icon: UserCircle, roles: ['student', 'instructor', 'admin', 'qa'] },
+  { name: 'Documentation', path: '/docs', icon: BookOpen, roles: ['student', 'instructor', 'admin', 'qa'] },
 ];
