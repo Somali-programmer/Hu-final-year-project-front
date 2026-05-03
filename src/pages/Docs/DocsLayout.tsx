@@ -3,9 +3,11 @@ import { NavLink, Outlet, Link } from 'react-router-dom';
 import { Book, Layers, BookOpen, FileText, ArrowLeft, Menu, X } from 'lucide-react';
 import ThemeToggle from '../../components/ThemeToggle';
 import Footer from '../../components/Footer';
+import { useAuth } from '../../AuthContext';
 
 const DocsLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const { user } = useAuth();
 
   const navItems = [
     { name: 'System Documentation', path: '/docs/system', icon: Book },
@@ -14,27 +16,35 @@ const DocsLayout: React.FC = () => {
     { name: 'Project Proposal', path: '/docs/proposal', icon: FileText },
   ];
 
+  const backLink = user ? '/dashboard' : '/';
+  const backText = user ? 'Back to Dashboard' : 'Back to Home';
+
   return (
     <div className="min-h-screen bg-brand-bg flex flex-col transition-colors duration-500">
       <div className="flex flex-1 relative">
         {/* Mobile Sidebar Toggle & Header overlay */}
         <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-brand-surface border-b border-brand-primary/10 px-4 py-3 flex items-center justify-between">
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="text-brand-text p-1 rounded-md bg-brand-bg border border-brand-primary/20"
-          >
-            {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-          <span className="font-serif font-bold text-brand-primary">HU-AMS Docs</span>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="text-brand-text p-1 rounded-md bg-brand-bg border border-brand-primary/20"
+            >
+              {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+            <Link to={backLink} className="text-brand-muted hover:text-brand-primary" title={backText}>
+              <ArrowLeft className="w-6 h-6" />
+            </Link>
+          </div>
+          <span className="font-serif font-bold text-brand-primary truncate max-w-[120px] text-center">Docs</span>
           <ThemeToggle />
         </div>
 
         {/* Sidebar */}
         <aside className={`fixed md:sticky top-0 left-0 h-screen w-64 bg-brand-surface border-r border-brand-primary/10 flex flex-col z-30 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0 mt-[60px] md:mt-0 h-[calc(100vh-60px)] md:h-screen' : '-translate-x-full md:translate-x-0'}`}>
           <div className="p-6 hidden md:block">
-            <Link to="/" className="inline-flex items-center gap-2 text-brand-muted hover:text-brand-primary transition-colors font-medium mb-6">
+            <Link to={backLink} className="inline-flex items-center gap-2 text-brand-muted hover:text-brand-primary transition-colors font-medium mb-6">
               <ArrowLeft className="w-5 h-5" />
-              Back to Home
+              {backText}
             </Link>
             <h2 className="text-xl font-serif font-bold tracking-tight text-brand-primary">HU-AMS Docs</h2>
           </div>
@@ -59,9 +69,9 @@ const DocsLayout: React.FC = () => {
           </nav>
           {/* Mobile Back Link in Sidebar */}
           <div className="p-4 md:hidden border-t border-brand-primary/10">
-            <Link to="/" className="flex items-center gap-2 text-brand-muted hover:text-brand-primary transition-colors font-medium">
+            <Link to={backLink} className="flex items-center gap-2 text-brand-muted hover:text-brand-primary transition-colors font-medium">
               <ArrowLeft className="w-5 h-5" />
-              Back to Home
+              {backText}
             </Link>
           </div>
         </aside>

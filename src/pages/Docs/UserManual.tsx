@@ -1,108 +1,151 @@
 import React from 'react';
-import { BookOpen, CheckCircle, Smartphone, MonitorPlay, AlertTriangle } from 'lucide-react';
+import { BookOpen, CheckCircle, Smartphone, MonitorPlay, AlertTriangle, ShieldCheck, FileSpreadsheet, Lock, Key, Target, Activity, FileDown, Layers, Users, Combine } from 'lucide-react';
 
 const UserManual: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
-      <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded-r-xl flex gap-4">
-        <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
-        <div className="space-y-1 text-sm text-yellow-800 dark:text-yellow-500">
-          <p className="font-bold">Project Defense Notice</p>
-          <p>
-            This manual outlines the operational workflow for end-users interacting with the HU-AMS platform.
-          </p>
-          <p className="opacity-80 pt-1">
-            <strong>Note:</strong> Following the final year presentation, internal test credentials and simulated environment instructions will be removed to ensure production integrity and security.
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-6 rounded-r-xl flex gap-4 md:items-center shadow-sm">
+        <AlertTriangle className="w-8 h-8 text-yellow-600 flex-shrink-0" />
+        <div className="space-y-2 text-sm text-yellow-800 dark:text-yellow-500">
+          <p className="font-bold text-base">Project Defense Notice: Operational Workflow</p>
+          <p className="leading-relaxed">
+            This module represents Phase 3 of the structural defense documentation. It outlines the 10 core operational workflows and step-by-step procedures for all authorized personnel interacting with the HU-AMS platform.
           </p>
         </div>
       </div>
 
-      <header className="space-y-4">
+      <header className="space-y-4 border-b border-brand-primary/10 pb-8">
         <div className="flex items-center gap-3 text-brand-primary">
-          <BookOpen className="w-8 h-8" />
-          <h1 className="text-4xl font-serif font-bold tracking-tight">User Manual</h1>
+          <BookOpen className="w-10 h-10" />
+          <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">System User Manual</h1>
         </div>
-        <p className="text-gray-500 text-lg">
-          Step-by-step instructions for Instructors, Students, and Administrators to navigate the HU-AMS platform.
+        <p className="text-gray-500 text-lg md:text-xl max-w-3xl leading-relaxed">
+          Comprehensive step-by-step operational instructions mapping all essential requirements for complete system utilization.
         </p>
       </header>
 
       <section className="space-y-8">
-        <div className="hu-card p-8 space-y-6">
-          <div className="flex items-center gap-3">
-            <MonitorPlay className="w-6 h-6 text-brand-primary" />
-            <h2 className="text-2xl font-bold text-brand-text">For Instructors</h2>
+        
+        {/* Core & Universal */}
+        <div className="hu-card p-8 space-y-4">
+          <h2 className="text-2xl font-bold flex items-center gap-3 text-brand-text">
+            <span className="bg-brand-primary/10 text-brand-primary w-8 h-8 flex items-center justify-center rounded-lg text-sm">01</span>
+            Authentication & Safe Onboarding (All Users)
+          </h2>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            Every user interacting with the platform must undergo verification. Access the central portal and provide your University credentials. Do not share or attempt to proxy logins, as your JWT payload binds your exact permissions to your device. Support is available for compromised credentials via the IT desk mapping.
+          </p>
+        </div>
+
+        {/* INSTRUCTORS */}
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="hu-card p-8 space-y-4 border-t-4 border-brand-primary">
+            <h2 className="text-2xl font-bold flex items-center gap-3 text-brand-primary">
+              <span className="bg-brand-primary/10 text-brand-primary w-8 h-8 flex items-center justify-center rounded-lg text-sm">02</span>
+              Instructor: Genesis (Session Creation)
+            </h2>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              <strong>Workflow:</strong> Navigate to the <code className="text-xs bg-gray-100 p-1 rounded">Sessions</code> tab. Select your target Section. Define boundaries including session length and late-threshold limits. The platform mandates that you grant HTML5 Location Access to establish the Session's "Zero-Point Geofence". Upon clicking "Start", display the generated 6-digit cryptographic seed to the lecture hall.
+            </p>
           </div>
-          <div className="space-y-4 text-gray-600">
-            <h3 className="font-bold text-lg text-brand-primary">Starting an Attendance Session</h3>
-            <ol className="list-decimal pl-5 space-y-2">
-              <li>Log in to the portal using your University Email.</li>
-              <li>Navigate to the <strong>Sessions</strong> tab in your dashboard.</li>
-              <li>Select your active Class/Section from the dropdown.</li>
-              <li>Configure the Session (Duration, Late Threshold).</li>
-              <li>Ensure your device GPS is enabled and allowed in the browser.</li>
-              <li>Click <strong>Start Session</strong>. A 6-digit token will be displayed on your screen to share with students.</li>
-            </ol>
-            
-            <h3 className="font-bold text-lg text-brand-primary mt-6">Monitoring & Reports</h3>
-            <ul className="list-disc pl-5 space-y-2">
-              <li>Open the <strong>Reports</strong> tab to see overall attendance percentage.</li>
-              <li>You can view individual attendance records for your scheduled sections.</li>
-              <li>Export attendance directly using the "Export" button for grading.</li>
-            </ul>
+
+          <div className="hu-card p-8 space-y-4 border-t-4 border-brand-primary">
+            <h2 className="text-2xl font-bold flex items-center gap-3 text-brand-primary">
+              <span className="bg-brand-primary/10 text-brand-primary w-8 h-8 flex items-center justify-center rounded-lg text-sm">03</span>
+               Instructor: Live Monitoring & Overrides
+            </h2>
+             <p className="text-gray-600 text-sm leading-relaxed">
+              <strong>Workflow:</strong> Open the <code className="text-xs bg-gray-100 p-1 rounded">Reports</code> tab while a session is active. Do not refresh; the system leverages WAL streams to push updates autonomously. In scenarios where a student's device fails algorithmically due to hardware constraints, the Instructor holds authorization to perform a manual Attendance Override directly from their ledger view.
+            </p>
           </div>
         </div>
 
-        <div className="hu-card p-8 space-y-6">
-          <div className="flex items-center gap-3">
-            <Smartphone className="w-6 h-6 text-hu-gold" />
-            <h2 className="text-2xl font-bold text-brand-text">For Students</h2>
+        {/* STUDENTS */}
+        <div className="grid md:grid-cols-2 gap-8">
+           <div className="hu-card p-8 space-y-4 border-t-4 border-hu-gold">
+            <h2 className="text-2xl font-bold flex items-center gap-3 text-hu-gold">
+              <span className="bg-hu-gold/20 text-hu-gold w-8 h-8 flex items-center justify-center rounded-lg text-sm">04</span>
+              Student: Discovery & Cryptographic Check-in
+            </h2>
+             <p className="text-gray-600 text-sm leading-relaxed">
+              <strong>Workflow:</strong> Upon logging in, go to the <code className="text-xs bg-gray-100 p-1 rounded">Mark Attendance</code> hub. Locate the actively broadcasting session matching your timeline. Inject the volatile 6-digit seed displayed by the Instructor. If accurate, the request securely transmits your coordinates for verification.
+            </p>
           </div>
-          <div className="space-y-4 text-gray-600">
-            <h3 className="font-bold text-lg text-brand-primary">Marking Your Attendance</h3>
-            <ol className="list-decimal pl-5 space-y-2">
-              <li>Log in with your Student ID (Username).</li>
-              <li>Go to the <strong>Mark Attendance</strong> tab.</li>
-              <li>View active sessions for your enrolled courses.</li>
-              <li>Click "Mark Attendance" on an active session.</li>
-              <li><strong>Critical:</strong> You MUST allow location access in your browser when prompted. Without GPS, attendance cannot be recorded.</li>
-              <li>Enter the 6-digit token provided by your instructor.</li>
-              <li>A success notification will appear once the system verifies your location is within the class radius.</li>
-            </ol>
-            
-            <div className="bg-yellow-50 dark:bg-yellow-900/10 border-l-4 border-yellow-400 p-4 rounded-xl flex gap-3 text-sm mt-4">
-              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
-              <p className="text-yellow-800 dark:text-yellow-600">
-                If you get a "Not inside geofence" error, ensure your Wi-Fi is on (it helps GPS accuracy) and you are physically inside the designated lecture hall or center.
-              </p>
-            </div>
+
+          <div className="hu-card p-8 space-y-4 border-t-4 border-hu-gold">
+            <h2 className="text-2xl font-bold flex items-center gap-3 text-hu-gold">
+              <span className="bg-hu-gold/20 text-hu-gold w-8 h-8 flex items-center justify-center rounded-lg text-sm">05</span>
+              Student: Perimeter Troubleshooting
+            </h2>
+             <p className="text-gray-600 text-sm leading-relaxed">
+              If the system halts and outputs <em>"Not inside geofence"</em>, this is a calculated mathematical rejection. To resolve: 
+              <br/>1. Verify your device Wi-Fi is enabled (dramatically improves GPS precision via cell-tower mapping). 
+              <br/>2. Click "Allow" on the browser's Location prompt. 
+              <br/>3. Physically move closer to the Instructor to enter the 50m radius.
+            </p>
           </div>
         </div>
 
-        <div className="hu-card p-8 space-y-6">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-green-600" />
-            <h2 className="text-2xl font-bold text-brand-text">For Administrators</h2>
+        {/* QUALITY ASSURANCE (QA) */}
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="hu-card p-8 space-y-4 border-t-4 border-purple-500">
+            <h2 className="text-2xl font-bold flex items-center gap-3 text-purple-600">
+              <span className="bg-purple-600/10 text-purple-600 w-8 h-8 flex items-center justify-center rounded-lg text-sm">06</span>
+               QA: Navigating Systemic Reports
+            </h2>
+             <p className="text-gray-600 text-sm leading-relaxed">
+              <strong>Workflow:</strong> Ensure your RBAC level is QA. Access the <code className="text-xs bg-gray-100 p-1 rounded">Analytics Hub</code>. You possess "God's Eye" read-only access. Monitor macro-trajectories by filtering variables such as entire Batches, Programs, or specific Campus Centers to flag anomalous absenteeism trends over a semester timeline.
+            </p>
           </div>
-          <div className="space-y-4 text-gray-600">
-            <h3 className="font-bold text-lg text-brand-primary">Managing Users</h3>
-            <ul className="list-disc pl-5 space-y-2">
-              <li>Navigate to <strong>Administration &gt; Students</strong> or <strong>Staff</strong>.</li>
-              <li>Use the Bulk Import tool with the provided CSV template to add multiple users quickly.</li>
-              <li>Reset passwords and assign roles (Instructor, QA, Admin).</li>
-            </ul>
 
-            <h3 className="font-bold text-lg text-brand-primary mt-6">Sections & Enrollments</h3>
-            <ul className="list-disc pl-5 space-y-2">
-              <li>Ensure <strong>Programs</strong> and <strong>Batches</strong> are configured properly.</li>
-              <li>When assigning a Section to a Course, link the correct Instructor.</li>
-              <li>The system uses "Autonomous Enrollment". Once a Section is created for a given Batch and Center, students in that Batch are automatically enrolled by database triggers.</li>
-            </ul>
+          <div className="hu-card p-8 space-y-4 border-t-4 border-purple-500">
+             <h2 className="text-2xl font-bold flex items-center gap-3 text-purple-600">
+              <span className="bg-purple-600/10 text-purple-600 w-8 h-8 flex items-center justify-center rounded-lg text-sm">07</span>
+              QA: Exporting Audit Logs
+            </h2>
+             <p className="text-gray-600 text-sm leading-relaxed">
+              <strong>Workflow:</strong> For institutional compliance meetings with academic Deans, utilize the <code className="text-xs bg-gray-100 p-1 rounded">Export Module</code>. Configure parameters (date range, department, section) and download robust, tamper-evident CSV ledgers that provide immutable historical records of compliance.
+            </p>
           </div>
         </div>
+
+        {/* ADMINISTRATORS */}
+        <div className="hu-card p-8 space-y-4 border-t-4 border-green-500">
+            <h2 className="text-2xl font-bold flex items-center gap-3 text-green-700">
+              <span className="bg-green-600/10 text-green-700 w-8 h-8 flex items-center justify-center rounded-lg text-sm">08</span>
+              Admin: Institutional Skeleton Mapping
+            </h2>
+             <p className="text-gray-600 text-sm leading-relaxed">
+              <strong>Workflow:</strong> Administrators do not collect attendance. Instead, they define mapping logic. Navigate to <code className="text-xs bg-gray-100 p-1 rounded">Admin Console</code>. First, map out the Centers (Main, Harar). Then forge Departments, assign Programs (Regular/Extension), and generate Batches matching the current Academic Year. This exact structure prevents data collisions.
+            </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="hu-card p-8 space-y-4 border-t-4 border-green-500">
+            <h2 className="text-2xl font-bold flex items-center gap-3 text-green-700 mt-1">
+              <span className="bg-green-600/10 text-green-700 w-8 h-8 flex items-center justify-center rounded-lg text-sm shrink-0">09</span>
+              Admin: Fast-Track Ingestion (CSV)
+            </h2>
+             <p className="text-gray-600 text-sm leading-relaxed">
+              <strong>Workflow:</strong> Under <code className="text-xs bg-gray-100 p-1 rounded">Users &gt; Bulk Import</code>. Manually typing 4,000 students is impossible. Download the system's exact CSV Schema Template. Populate it with Student IDs, Names, Batch mapping IDs, and emails. Upload it to instantly forge user accounts and trigger Postgres to auto-enroll them in their generated Sections.
+            </p>
+          </div>
+
+          <div className="hu-card p-8 space-y-4 border-t-4 border-green-500">
+            <h2 className="text-2xl font-bold flex items-center gap-3 text-green-700 mt-1">
+              <span className="bg-green-600/10 text-green-700 w-8 h-8 flex items-center justify-center rounded-lg text-sm shrink-0">10</span>
+              Admin: Cohort Promotion (Advance Term)
+            </h2>
+             <p className="text-gray-600 text-sm leading-relaxed">
+              <strong>Workflow:</strong> At the close of an academic period, navigate to the <code className="text-xs bg-gray-100 p-1 rounded">Batch Management</code> panel. Execute the administrative "Advance Term" protocol. This mathematically increments the <code>current_semester</code> index for a program. If it exceeds constraints (e.g., &gt; 2 for Regular), it autonomously loops to Sem 1 and increments the Cohort Year.
+            </p>
+          </div>
+        </div>
+
       </section>
     </div>
   );
 };
 
 export default UserManual;
+
