@@ -15,33 +15,48 @@ interface Notification {
   createdAt: string;
 }
 
-const mockNotifications: Record<string, Notification[]> = {
-  instructor: [
-    { id: '1', title: 'System Maintenance', message: 'HU-AMS will undergo scheduled maintenance tonight at 2AM.', type: 'info', isRead: false, createdAt: new Date(Date.now() - 3600000).toISOString() },
-    { id: '2', title: 'New Course Assigned', message: 'You have been assigned to teach SEng442: AI.', type: 'success', isRead: true, createdAt: new Date(Date.now() - 86400000).toISOString() }
-  ],
-  student: [
-    { id: '3', title: 'Attendance Warning', message: 'Your attendance for Compiler Design has dropped below 85%.', type: 'alert', isRead: false, createdAt: new Date(Date.now() - 1800000).toISOString() },
-    { id: '4', title: 'Session Started', message: 'A live session for AI has just started.', type: 'info', isRead: false, createdAt: new Date(Date.now() - 300000).toISOString() }
-  ],
-  qa_officer: [
-    { id: '5', title: 'Weekly Report Generated', message: 'The attendance audit report for week 4 is ready.', type: 'success', isRead: false, createdAt: new Date(Date.now() - 7200000).toISOString() }
-  ]
-};
-
 export const NotificationBell: React.FC = () => {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  // Minimal notification state (just using mock data based on role for now)
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  useEffect(() => {
-    if (user?.role) {
-      setNotifications(mockNotifications[user.role as keyof typeof mockNotifications] || []);
+  const fetchNotifications = async () => {
+    if (!user?.userId) return;
+    try {
+      const res = await fetch(`/api/notifications?userId=${user.userId}`);
+      if (!res.ok) throw new Error('Failed to fetch notifications');
+      const data = await res.json();
+      setNotifications(data);
+    } catch (err) {
+      console.error('Failed to parse notifications:', err);
     }
-  }, [user]);
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+
+    let timeout: any = null;
+    const eventSource = new EventSource('/api/events');
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'update' && data.table === 'notifications') {
+          if (timeout) clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            fetchNotifications();
+          }, 1000);
+        }
+      } catch (err) {}
+    };
+
+    return () => {
+      eventSource.close();
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [user?.userId]);
 
   // Click outside to close
   useEffect(() => {
@@ -56,13 +71,24 @@ export const NotificationBell: React.FC = () => {
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
+    if (!user?.userId) return;
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    try {
+      await fetch('/api/notifications/read-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.userId })
+      });
+    } catch (err) {}
   };
 
-  const markAsRead = (id: string, e: React.MouseEvent) => {
+  const markAsRead = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    try {
+      await fetch(`/api/notifications/${id}/read`, { method: 'PUT' });
+    } catch (err) {}
   };
 
   const getIcon = (type: NotificationType) => {
@@ -70,12 +96,14 @@ export const NotificationBell: React.FC = () => {
       case 'alert': return <AlertTriangle className="w-5 h-5 text-red-500" />;
       case 'success': return <CheckCircle className="w-5 h-5 text-green-500" />;
       case 'info': return <Info className="w-5 h-5 text-blue-500" />;
+      default: return <Info className="w-5 h-5 text-blue-500" />;
     }
   };
 
   // Simple relative time formatter
   const timeAgo = (dateString: string) => {
     const minDiff = Math.floor((new Date().getTime() - new Date(dateString).getTime()) / 60000);
+    if (minDiff < 1) return `Just now`;
     if (minDiff < 60) return `${minDiff}m ago`;
     const hourDiff = Math.floor(minDiff / 60);
     if (hourDiff < 24) return `${hourDiff}h ago`;

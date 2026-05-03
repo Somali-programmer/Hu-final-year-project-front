@@ -161,6 +161,17 @@ CREATE TABLE audit_logs (
     timestamp TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Notifications
+CREATE TABLE notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    type TEXT NOT NULL DEFAULT 'info', -- 'alert', 'info', 'success'
+    is_read BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- 5. AUTO-ENROLLMENT TRIGGERS (Declarative Architecture)
 
 -- Function: Auto-enroll student into active sections when a student profile is created or updated
