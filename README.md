@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://somali-programmer.github.io/2018_exit_exam-/logo.png" alt="Haramaya University Logo" width="120" />
+  <img src="https://somali-programmer.github.io/2018_exit_exam-/logo.png" alt="Haramaya University Logo" width="1280" />
   <h1>HU-AMS: Haramaya University Attendance Management System</h1>
   <p><strong>A Final Year Computer Science Capstone Project</strong></p>
   <p align="center">
