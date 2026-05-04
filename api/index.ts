@@ -313,10 +313,17 @@ app.post('/api/auth/login', async (req, res) => {
       });
 
       if (verification.verified && verification.registrationInfo) {
-        const { credentialPublicKey, credentialID, counter } = verification.registrationInfo as any;
+        const { registrationInfo } = verification;
+        
+        // In v13, registrationInfo has a credential object
+        const credentialID = registrationInfo.credential.id;
+        const credentialPublicKey = registrationInfo.credential.publicKey;
+        const counter = registrationInfo.credential.counter;
+
+        console.log('[WebAuthn Registration] Extracted:', { credentialID: !!credentialID, credentialPublicKey: !!credentialPublicKey, counter });
 
         const newCredential = {
-          id: Buffer.from(credentialID).toString('base64'),
+          id: credentialID, // Already a base64url string
           publicKey: Buffer.from(credentialPublicKey).toString('base64'),
           counter,
           transports: req.body.response.transports || [],
@@ -356,7 +363,7 @@ app.post('/api/auth/login', async (req, res) => {
       const options = await generateAuthenticationOptions({
         rpID,
         allowCredentials: credentials.map((cred: any) => ({
-          id: Buffer.from(cred.id, 'base64'),
+          id: cred.id,
           type: 'public-key',
           transports: cred.transports,
         })),
@@ -397,12 +404,13 @@ app.post('/api/auth/login', async (req, res) => {
         expectedChallenge: user.webauthn_current_challenge,
         expectedOrigin: origin,
         expectedRPID: rpID,
-        authenticator: {
-          credentialID: Buffer.from(credential.id, 'base64'),
-          credentialPublicKey: Buffer.from(credential.publicKey, 'base64'),
+        credential: {
+          id: credential.id,
+          publicKey: new Uint8Array(Buffer.from(credential.publicKey, 'base64')),
           counter: credential.counter,
+          transports: credential.transports,
         },
-      } as any);
+      });
 
       if (verification.verified) {
         // Update counter
