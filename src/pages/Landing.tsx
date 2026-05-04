@@ -103,7 +103,7 @@ export default function Landing() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-surface border border-brand-border text-brand-primary shadow-sm text-xs font-bold tracking-widest uppercase mb-8">
                 <span className="w-2 h-2 rounded-full bg-brand-primary animate-pulse"></span>
-                Final Year Project Proposal
+                Final Year Project
               </div>
               
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[8rem] font-sans font-bold tracking-tighter text-brand-text leading-[0.9] mb-6 drop-shadow-sm">
@@ -111,11 +111,11 @@ export default function Landing() {
               </h1>
               
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-medium text-brand-text/90 mb-8 max-w-3xl mx-auto bg-clip-text text-transparent bg-gradient-to-r from-brand-text to-brand-muted">
-                Haramaya University Attendance Management System
+                The Definitive Intellectual Governance & Attendance Hub
               </h2>
               
               <p className="text-base md:text-xl text-brand-muted max-w-2xl mx-auto mb-12 leading-relaxed font-light">
-                A state-of-the-art software solution crafted exclusively for Computer Science students and faculty. Designed to streamline academic tracking, enhance integrity, and modernize physical classrooms.
+                A high-integrity digital ecosystem engineered exclusively for Haramaya University. Leveraging biometric WebAuthn security, geospatial geofencing, and autonomous database synchronization to eliminate academic fraud.
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
@@ -145,17 +145,17 @@ export default function Landing() {
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={sectionVariants}
             className="text-center max-w-3xl mx-auto mb-20 md:mb-24"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-serif font-bold mb-6 text-brand-text tracking-tight">A System Built for <span className="text-brand-primary">Scale</span></h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-serif font-bold mb-6 text-brand-text tracking-tight">Enterprise-Grade <span className="text-brand-primary">Academic Integrity</span></h2>
             <p className="text-base sm:text-lg md:text-xl text-brand-muted font-light leading-relaxed">
-              HU-AMS is an advanced architectural solution utilizing real-time database syncing, role-based workflows, and uncompromising data integrity to manage the complexity of academic attendance.
+              HU-AMS is an advanced multi-tenant architectural solution utilizing real-time Postgres triggers, geospatial geofencing, and FIDO2 biometric authentication to ensure uncompromising audit accuracy.
             </p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 px-2">
             {[
-              { icon: Layers, title: "Role-Based Architecture", desc: "Granular access controls for Students, Instructors, Quality Assurance Officers, and Administrators." },
-              { icon: Database, title: "Immutable Audit Trails", desc: "Every action is logged. Institutional memory is preserved. Trust is guaranteed through cryptographically sound methodologies." },
-              { icon: Users, title: "Seamless Auto-Enrollment", desc: "Database-level triggers map students to courses instantly, eliminating manual data entry delays." }
+              { icon: Shield, title: "Biometric Core", desc: "Native WebAuthn (TouchID/FaceID) integration ensures that academic records are mathematically secured against proxy fraud." },
+              { icon: Activity, title: "Geospatial Gating", desc: "Advanced GPS enclosure validation mandates absolute physical presence within instructor-defined perimeters for record activation." },
+              { icon: Layers, title: "Autonomous Synergy", desc: "Enterprise-grade database triggers autonomously synchronize student cohorts to active sections with zero human intervention." }
             ].map((feature, idx) => (
               <motion.div 
                 key={idx}
@@ -184,9 +184,9 @@ export default function Landing() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-surface border border-brand-border text-brand-primary text-xs font-bold tracking-widest uppercase mb-6 shadow-sm">
                  What is Haramaya University
               </div>
-              <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[5rem] font-sans font-bold tracking-tight mb-8 leading-[1.1] text-brand-text">Building the base of<br/>development</h2>
+              <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[5rem] font-sans font-bold tracking-tight mb-8 leading-[1.1] text-brand-text">Pioneering the Future of Academic Records</h2>
               <p className="text-base md:text-xl text-brand-muted mb-10 leading-relaxed font-light">
-                Haramaya University (HU), established in 1954 as a pioneer in agricultural education, is a top public research university in Ethiopia located near Dire Dawa. It offers diverse undergraduate and postgraduate programs, aiming to become a leading African university by 2030, with a focus on agriculture, technology, and health sciences.
+                Haramaya University (HU) has been at the forefront of Ethiopian education since 1954. With the deployment of HU-AMS, we are setting a continental standard for digital record integrity, transitioning from manual vulnerability to digital absolute truth.
               </p>
               <div className="grid grid-cols-2 gap-8 pt-8 border-t border-brand-border/50">
                 <div className="group">

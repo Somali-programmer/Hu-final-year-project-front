@@ -13,7 +13,7 @@ const DocsLayout: React.FC = () => {
     { name: 'System Documentation', path: '/docs/system', icon: Book },
     { name: 'System Architecture', path: '/docs/architecture', icon: Layers },
     { name: 'User Manual', path: '/docs/manual', icon: BookOpen },
-    { name: 'Project Proposal', path: '/docs/proposal', icon: FileText },
+    { name: 'Final Year Project', path: '/docs/proposal', icon: FileText },
   ];
 
   const backLink = user ? '/dashboard' : '/';

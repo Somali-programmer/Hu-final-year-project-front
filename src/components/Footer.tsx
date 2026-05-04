@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
             <h3 className="font-serif font-bold text-xl text-brand-text">HU-AMS Haramaya </h3>
           </div>
           <p className="text-sm text-gray-500 max-w-sm leading-relaxed">
-            The official attendance management ecosystem for Haramaya University, Department of Computer Science. Engineered for accuracy, scalability, and academic integrity.
+            The definitive academic governance ecosystem for Haramaya University. Engineered with FIDO2 biometrics and geospatial precision to safeguard the future of institutional record-keeping.
           </p>
         </div>
 

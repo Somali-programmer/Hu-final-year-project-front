@@ -7,9 +7,9 @@ const ProjectProposal: React.FC = () => {
       <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-6 rounded-r-xl flex gap-4 md:items-center shadow-sm">
         <FileText className="w-8 h-8 text-yellow-600 flex-shrink-0" />
         <div className="space-y-2 text-sm text-yellow-800 dark:text-yellow-500">
-          <p className="font-bold text-base">Project Defense Notice: Structural Evolution & Proposal</p>
+          <p className="font-bold text-base">Project Defense Notice: Structural Evolution & Final Year Project</p>
           <p className="leading-relaxed">
-            This module represents Phase 4 of the structural defense documentation. It outlines the evolutionary journey from our original FYP Proposal (Project I) to the current enterprise-grade implementation (Project II), detailing the specific architectural sequence logic and engineering pivots executed.
+            This module represents Phase 4 of the structural defense documentation. It outlines the evolutionary journey from our original FYP (Project I) to the current enterprise-grade implementation (Project II), detailing the specific architectural sequence logic and engineering pivots executed.
           </p>
         </div>
       </div>
@@ -17,7 +17,7 @@ const ProjectProposal: React.FC = () => {
       <header className="space-y-4 border-b border-brand-primary/10 pb-8">
         <div className="flex items-center gap-3 text-brand-primary">
           <GraduationCap className="w-10 h-10" />
-          <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">Project Proposal & Evolution</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">Final Year Project Evolution</h1>
         </div>
         <p className="text-gray-500 text-lg md:text-xl max-w-3xl leading-relaxed">
            A professional system architect's report bridging our original legacy proposition with the modern distributed framework we achieved.
@@ -33,7 +33,7 @@ const ProjectProposal: React.FC = () => {
             Project I Proposition (The Original Vision)
           </h2>
           <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-            At inception, our FYP proposal outlined a localized "Online Attendance System for HU CS Students". The proposed solution was inherently limited: building a fast web application to replace manual roll-call using Vanilla React.js, Express.js, a Local PostgreSQL instance, and Socket.io for synchronous websocket communication.
+            At inception, our FYP specification outlined a localized "Online Attendance System for HU CS Students". The proposed solution was inherently limited: building a fast web application to replace manual roll-call using Vanilla React.js, Express.js, a Local PostgreSQL instance, and Socket.io for synchronous websocket communication.
           </p>
         </div>
 
@@ -44,7 +44,7 @@ const ProjectProposal: React.FC = () => {
             The Realization (Structural Dependency Flaw)
           </h2>
           <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-            During the implementation phase of Project II, a deep architectural audit revealed a critical flaw: <strong>An attendance system cannot function in isolation.</strong> Building an "Attendance" module before an "Institutional Management" module was a severe inversion of system logic. An attendance record does not exist without a <em>Section</em>, which belongs to a <em>Batch</em>, inside a <em>Program</em>, under a <em>Department</em>, located at a physical <em>Center</em>.
+            During the implementation phase of Project II, a deep architectural audit revealed a critical flaw: <strong>An attendance system cannot function in isolation.</strong> Building an "Attendance" module before an "Institutional Management" module was a severe inversion of system logic.
           </p>
         </div>
 

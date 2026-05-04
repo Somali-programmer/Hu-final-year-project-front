@@ -133,7 +133,7 @@ const Login: React.FC = () => {
           <h1 className="text-3xl font-serif font-bold text-brand-text mb-2 tracking-tight transition-colors">
             HU <span className="text-brand-primary italic">Attendance</span>
           </h1>
-          <p className="text-brand-muted font-medium uppercase tracking-[0.3em] text-[10px] transition-colors">Computer Science Department</p>
+          <p className="text-brand-muted font-medium uppercase tracking-[0.3em] text-[10px] transition-colors">High-Integrity Academic Tracking</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">

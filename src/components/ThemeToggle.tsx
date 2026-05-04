@@ -11,7 +11,7 @@ const ThemeToggle: React.FC = () => {
     <button
       onClick={toggleTheme}
       className={cn(
-        "relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 overflow-hidden group shadow-lg",
+        "relative w-9 h-9 rounded-full flex items-center justify-center transition-all duration-500 overflow-hidden group shadow-md",
         "bg-brand-primary/10 border border-brand-primary/20 text-brand-primary"
       )}
     >
@@ -19,22 +19,22 @@ const ThemeToggle: React.FC = () => {
         {theme === 'light' ? (
           <motion.div
             key="moon"
-            initial={{ y: 20, opacity: 0, rotate: -45 }}
+            initial={{ y: 15, opacity: 0, rotate: -45 }}
             animate={{ y: 0, opacity: 1, rotate: 0 }}
-            exit={{ y: -20, opacity: 0, rotate: 45 }}
+            exit={{ y: -15, opacity: 0, rotate: 45 }}
             transition={{ duration: 0.3, ease: "backOut" }}
           >
-            <Moon className="w-5 h-5 fill-current" />
+            <Moon className="w-4 h-4 fill-current" />
           </motion.div>
         ) : (
           <motion.div
             key="sun"
-            initial={{ y: 20, opacity: 0, rotate: -45 }}
+            initial={{ y: 15, opacity: 0, rotate: -45 }}
             animate={{ y: 0, opacity: 1, rotate: 0 }}
-            exit={{ y: -20, opacity: 0, rotate: 45 }}
+            exit={{ y: -15, opacity: 0, rotate: 45 }}
             transition={{ duration: 0.3, ease: "backOut" }}
           >
-            <Sun className="w-5 h-5 fill-current" />
+            <Sun className="w-4 h-4 fill-current" />
           </motion.div>
         )}
       </AnimatePresence>
