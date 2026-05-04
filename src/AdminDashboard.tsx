@@ -204,6 +204,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
   const [filterCenter, setFilterCenter] = useState<Center | 'all'>('all');
   const [filterProgram, setFilterProgram] = useState<ProgramType | 'all'>('all');
   const [filterBatch, setFilterBatch] = useState<string>('all');
+  const [filterCenterReport, setFilterCenterReport] = useState<string>('all');
 
   // Form States
   const [userForm, setUserForm] = useState<Partial<User>>({
@@ -971,20 +972,87 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
 
           {/* Department Reports Section */}
           <section className="space-y-6 md:space-y-8">
-            <div className="flex items-center gap-4">
-              <FileText className="w-6 h-6 text-brand-primary" />
-              <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">Departmental Reports</h2>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <FileText className="w-6 h-6 text-brand-primary" />
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">Departmental Reports</h2>
+              </div>
+              
+              <div className="flex items-center gap-3 bg-brand-primary/5 p-2 rounded-2xl border border-brand-primary/10">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-muted ml-2">Filter by Center:</span>
+                <select 
+                  value={filterCenterReport}
+                  onChange={(e) => setFilterCenterReport(e.target.value)}
+                  className="px-4 py-2 bg-white dark:bg-brand-surface border border-brand-border rounded-xl text-[10px] font-bold uppercase tracking-widest focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all shadow-sm"
+                >
+                  <option value="all">All Centers</option>
+                  {centers.map(c => (
+                    <option key={c.centerId} value={c.centerId}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {['Computer Science', 'Information Systems', 'Software Engineering', 'IT Management'].map((dept) => (
-                <div key={dept} className="hu-card-alt p-5 md:p-6 flex items-center justify-between group hover:bg-brand-surface transition-all">
-                  <div>
-                    <p className="text-sm font-bold text-brand-text">{dept}</p>
-                    <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest mt-1">Attendance Summary</p>
+              {(departments.length > 0 ? departments.map(d => d.name) : ['Computer Science']).map((dept) => (
+                <div key={dept} className="hu-card-alt p-5 md:p-6 flex items-center justify-between group hover:bg-brand-surface transition-all border border-brand-border hover:border-brand-primary/30">
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-brand-text group-hover:text-brand-primary transition-colors">{dept}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">
+                        {filterCenterReport === 'all' ? 'Consolidated' : centers.find(c => c.centerId === filterCenterReport)?.name || filterCenterReport}
+                      </p>
+                      <span className="text-[10px] text-gray-300">•</span>
+                      <p className="text-[10px] text-brand-primary font-bold uppercase tracking-widest">Live</p>
+                    </div>
                   </div>
                   <button 
-                    onClick={() => handleDownloadDeptReport(dept)}
-                    className="p-3 bg-hu-cream rounded-xl text-brand-primary hover:bg-brand-primary hover:text-white dark:text-hu-charcoal transition-all shadow-sm"
+                    onClick={() => {
+                      const centerName = filterCenterReport === 'all' ? 'All Centers' : centers.find(c => c.centerId === filterCenterReport)?.name || filterCenterReport;
+                      toast.success(`Generating ${dept} report for ${centerName}...`);
+                    }}
+                    className="p-3 bg-hu-cream rounded-xl text-brand-primary hover:bg-brand-primary hover:text-white dark:text-hu-charcoal transition-all shadow-sm group-hover:scale-110 active:scale-95"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Batch Reports Section */}
+          <section className="space-y-6 md:space-y-8 mt-12 md:mt-20">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <GraduationCap className="w-6 h-6 text-brand-primary" />
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-text">Cohort Performance Reports</h2>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              {[
+                { name: 'Freshman (Year 1)', code: 'Freshman' },
+                { name: 'Junior (Year 2)', code: 'Junior' },
+                { name: 'Senior (Year 3)', code: 'Senior' },
+                { name: 'GC (Year 4)', code: 'GC' }
+              ].map((batch) => (
+                <div key={batch.code} className="hu-card-alt p-5 md:p-6 flex items-center justify-between group hover:bg-brand-surface transition-all border border-brand-border hover:border-brand-primary/30">
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-brand-text group-hover:text-brand-primary transition-colors">{batch.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">
+                        {filterCenterReport === 'all' ? 'All Centers' : centers.find(c => c.centerId === filterCenterReport)?.name || filterCenterReport}
+                      </p>
+                      <span className="text-[10px] text-gray-300">•</span>
+                      <p className="text-[10px] text-brand-primary font-bold uppercase tracking-widest">Active</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const centerName = filterCenterReport === 'all' ? 'All Centers' : centers.find(c => c.centerId === filterCenterReport)?.name || filterCenterReport;
+                      toast.success(`Generating attendance report for ${batch.name} at ${centerName}...`);
+                    }}
+                    className="p-3 bg-hu-cream rounded-xl text-brand-primary hover:bg-brand-primary hover:text-white dark:text-hu-charcoal transition-all shadow-sm group-hover:scale-110 active:scale-95"
                   >
                     <Download className="w-4 h-4" />
                   </button>

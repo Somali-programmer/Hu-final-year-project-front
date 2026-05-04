@@ -98,7 +98,7 @@ const Footer: React.FC = () => {
 
       <div className="max-w-7xl mx-auto pt-12 mt-12 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest">
-          © {new Date().getFullYear()} Haramaya University. All Rights Reserved.
+          © {new Date().getFullYear()} HU-AMS | Haramaya University CS Department.
         </p>
         <div className="flex items-center gap-6">
           <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest">V2.2.0-STABLE</p>

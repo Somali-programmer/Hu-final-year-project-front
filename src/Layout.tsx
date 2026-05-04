@@ -170,7 +170,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   </div>
                 </div>
                 <button
-                  onClick={() => logout()}
+                  onClick={() => {
+                    logout();
+                    window.location.href = '/';
+                  }}
                   className="p-1 text-brand-muted hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
                   title="Logout"
                 >

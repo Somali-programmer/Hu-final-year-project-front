@@ -9,9 +9,9 @@ const DashboardFooter: React.FC<DashboardFooterProps> = ({ onOpenModal }) => {
     <footer className="bg-brand-surface py-6 border-t border-brand-border text-center mt-auto flex-shrink-0">
       <div className="max-w-[1800px] mx-auto px-4 md:px-6 lg:px-10 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-2">
-          <img src="https://somali-programmer.github.io/2018_exit_exam-/logo.png" alt="HU Logo" className="w-6 h-6 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300" />
+          <img src="https://somali-programmer.github.io/2018_exit_exam-/header-logo.png" alt="HU Logo" className="w-6 h-6 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300" />
           <p className="text-brand-muted text-xs font-medium tracking-wide">
-            © {new Date().getFullYear()} Haramaya University CS Department
+            © {new Date().getFullYear()} HU-AMS | Haramaya University CS Department
           </p>
         </div>
         

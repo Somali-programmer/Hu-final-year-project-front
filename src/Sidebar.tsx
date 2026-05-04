@@ -76,7 +76,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         </div>
         
         <button
-          onClick={() => logout()}
+          onClick={() => {
+            logout();
+            window.location.href = '/';
+          }}
           className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-sm font-semibold text-brand-muted hover:text-red-500 hover:bg-red-500/10 transition-all duration-300"
         >
           <LogOut className="w-5 h-5" />

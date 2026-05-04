@@ -465,7 +465,7 @@ app.post('/api/auth/login', async (req, res) => {
       ]);
 
       res.json({
-        departments: depts.data,
+        departments: (depts.data || []).filter((d: any) => d.name === 'Computer Science'),
         centers: centers.data,
         batches: batches.data
       });
