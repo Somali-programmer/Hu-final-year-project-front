@@ -1,5 +1,5 @@
 {
   "name": "HU-AMS: Haramaya University Attendance Management System",
   "description": "A professional, web-based smart attendance management system designed for Haramaya University. Features include GPS geofencing, dynamic session tokens, and automated enrollment synchronization.",
-  "requestFramePermissions": ["geolocation"]
+  "requestFramePermissions": ["geolocation", "publickey-credentials-create", "publickey-credentials-get"]
 }

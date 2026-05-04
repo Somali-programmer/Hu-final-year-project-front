@@ -95,8 +95,10 @@ const Settings: React.FC = () => {
     } catch (err: any) {
       console.error(err);
       setBioStatus('error');
-      if (err.name === 'NotAllowedError') {
-        setBioMessage('Registration was canceled or blocked by the browser.');
+      if (err.message && err.message.includes('publickey-credentials-create')) {
+        setBioMessage('Please open the app in a new tab (using the button in the top right) to register biometrics. Browsers restrict this feature inside embedded views.');
+      } else if (err.name === 'NotAllowedError') {
+        setBioMessage('Registration was canceled or blocked by the browser. If you are in the preview iframe, try opening the app in a new tab.');
       } else {
         setBioMessage(err.message || 'Error occurred during registration.');
       }

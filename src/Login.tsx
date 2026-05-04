@@ -101,8 +101,10 @@ const Login: React.FC = () => {
       }
     } catch (err: any) {
       console.error(err);
-      if (err.name === 'NotAllowedError') {
-        setError('Biometric login was canceled.');
+      if (err.message && (err.message.includes('publickey-credentials-get') || err.message.includes('publickey-credentials-create'))) {
+        setError('Please open the app in a new tab to use biometrics. Browsers restrict this feature inside embedded views.');
+      } else if (err.name === 'NotAllowedError') {
+        setError('Biometric login was canceled or blocked. If you are in the preview iframe, try opening the app in a new tab.');
       } else {
         setError(err.message || 'Error occurred during biometric login.');
       }
