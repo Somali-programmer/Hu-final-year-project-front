@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { ShieldCheck, User as UserIcon, Lock, AlertCircle } from 'lucide-react';
+import { ShieldCheck, User as UserIcon, Lock, AlertCircle, Eye, EyeOff, Fingerprint } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from './lib/utils';
+import { startAuthentication } from '@simplewebauthn/browser';
 
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const [bioLoading, setBioLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +30,7 @@ const Login: React.FC = () => {
 
     setLoading(true);
     setError(null);
+    setInfoMessage(null);
     
     const result = await login(trimmedUsername, trimmedPassword);
     
@@ -38,6 +43,71 @@ const Login: React.FC = () => {
       }
       setError(msg);
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = () => {
+    setInfoMessage('If you forgot your password, please contact the System Administrator to reset it.');
+    setError(null);
+  };
+
+  const handleBiometricLogin = async () => {
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      setError('Please enter your Student ID or Staff Email first.');
+      return;
+    }
+
+    setBioLoading(true);
+    setError(null);
+    setInfoMessage(null);
+
+    try {
+      // 1. Get auth options from server
+      const optionsRes = await fetch('/api/auth/webauthn/generate-authentication-options', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: trimmedUsername })
+      });
+      
+      const optionsData = await optionsRes.json();
+      if (!optionsRes.ok) throw new Error(optionsData.error || 'Failed to get authentication options');
+
+      // 2. Present biometric challenge
+      const asseResp = await startAuthentication({ optionsJSON: optionsData });
+
+      // 3. Verify on server
+      const verifyRes = await fetch('/api/auth/webauthn/verify-authentication', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: trimmedUsername, response: asseResp })
+      });
+
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok) throw new Error(verifyData.error || 'Biometric verification failed');
+
+      // Login successful via WebAuthn, update token and redirect
+      if (verifyData.token) {
+        localStorage.setItem('hu_token', verifyData.token);
+        
+        let targetPath = '/student';
+        if (verifyData.user.role === 'admin') targetPath = '/admin';
+        else if (verifyData.user.role === 'instructor') targetPath = '/instructor';
+        
+        navigate(targetPath, { replace: true });
+        // The page reload might not be needed if AuthContext updates properly, 
+        // but Since login function also reloads if needed, let's just do window.location.href
+        window.location.href = targetPath;
+      }
+    } catch (err: any) {
+      console.error(err);
+      if (err.name === 'NotAllowedError') {
+        setError('Biometric login was canceled.');
+      } else {
+        setError(err.message || 'Error occurred during biometric login.');
+      }
+    } finally {
+      setBioLoading(false);
     }
   };
 
@@ -76,6 +146,17 @@ const Login: React.FC = () => {
             </motion.div>
           )}
 
+          {infoMessage && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-2 p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-blue-500 text-xs font-bold"
+            >
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{infoMessage}</span>
+            </motion.div>
+          )}
+
           <div className="space-y-4">
             <div className="relative group">
               <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-brand-muted group-focus-within:text-brand-primary transition-colors">
@@ -96,13 +177,31 @@ const Login: React.FC = () => {
                 <Lock className="w-4 h-4" />
               </div>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-brand-bg border border-brand-border rounded-2xl py-4 pl-12 pr-6 text-sm text-brand-text focus:outline-none focus:border-brand-primary transition-all placeholder:text-brand-muted/50"
+                className="w-full bg-brand-bg border border-brand-border rounded-2xl py-4 pl-12 pr-12 text-sm text-brand-text focus:outline-none focus:border-brand-primary transition-all placeholder:text-brand-muted/50"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-4 flex items-center text-brand-muted hover:text-brand-primary transition-colors"
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            
+            <div className="flex justify-end mt-2">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-xs font-medium text-brand-primary hover:text-brand-text transition-colors"
+              >
+                Forgot your password?
+              </button>
             </div>
           </div>
 
@@ -112,26 +211,53 @@ const Login: React.FC = () => {
             </p>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="hu-button w-full flex items-center justify-center gap-4 py-5"
-          >
-            {loading ? (
-              <div className="w-6 h-6 border-2 border-brand-text/30 border-t-brand-text rounded-full animate-spin" />
-            ) : (
-              <>
-                <span className="uppercase tracking-[0.2em] text-sm dark:text-hu-charcoal">Sign In</span>
-                <motion.div
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.5 }}
-                  className="dark:text-hu-charcoal"
-                >
-                  →
-                </motion.div>
-              </>
-            )}
-          </button>
+          <div className="flex flex-col gap-4">
+            <button
+              type="submit"
+              disabled={loading || bioLoading}
+              className="hu-button w-full flex items-center justify-center gap-4 py-5"
+            >
+              {loading ? (
+                <div className="w-6 h-6 border-2 border-brand-text/30 border-t-brand-text rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span className="uppercase tracking-[0.2em] text-sm dark:text-hu-charcoal">Sign In</span>
+                  <motion.div
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                    className="dark:text-hu-charcoal"
+                  >
+                    →
+                  </motion.div>
+                </>
+              )}
+            </button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-brand-border"></span>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-brand-bg px-2 text-brand-muted tracking-widest">Or</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleBiometricLogin}
+              disabled={loading || bioLoading}
+              className="hu-button-alt w-full flex items-center justify-center gap-3 py-4 border border-brand-border bg-brand-bg/50 hover:bg-brand-border/20 text-brand-text"
+            >
+              {bioLoading ? (
+                <div className="w-5 h-5 border-2 border-brand-primary/30 border-t-brand-primary rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Fingerprint className="w-5 h-5 text-brand-primary" />
+                  <span className="uppercase tracking-[0.1em] text-sm font-medium">Biometric Login</span>
+                </>
+              )}
+            </button>
+          </div>
 
           <p className="text-[10px] font-bold text-brand-muted/40 uppercase tracking-[0.2em] pt-6 border-t border-brand-border mt-8">
             Haramaya University • &copy; 2026

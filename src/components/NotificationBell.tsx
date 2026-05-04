@@ -26,7 +26,10 @@ export const NotificationBell: React.FC = () => {
     if (!user?.userId) return;
     try {
       const res = await fetch(`/api/notifications?userId=${user.userId}`);
-      if (!res.ok) throw new Error('Failed to fetch notifications');
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Status ${res.status}: ${text}`);
+      }
       const data = await res.json();
       setNotifications(data);
     } catch (err) {

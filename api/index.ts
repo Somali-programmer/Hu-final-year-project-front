@@ -9,6 +9,12 @@ import { EventEmitter } from 'events';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { bulkRegisterStudents } from '../server/services/import.service.js';
+import {
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
+  generateAuthenticationOptions,
+  verifyAuthenticationResponse,
+} from '@simplewebauthn/server';
 
 dotenv.config();
 
@@ -185,6 +191,238 @@ app.post('/api/auth/login', async (req, res) => {
       });
     } catch (err) {
       res.status(401).json({ success: false, message: 'Invalid token' });
+    }
+  });
+
+  app.post('/api/auth/change-password', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ success: false, message: 'Missing required fields' });
+      }
+
+      const { data: user, error } = await supabaseAdmin
+        .from('users')
+        .select('*')
+        .eq('id', decoded.userId)
+        .single();
+
+      if (error || !user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+
+      const isValid = await bcrypt.compare(currentPassword, user.password_hash);
+      if (!isValid) {
+        return res.status(401).json({ success: false, message: 'Incorrect current password' });
+      }
+
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      const { error: updateError } = await supabaseAdmin
+        .from('users')
+        .update({ password_hash: hashedNewPassword })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+      
+      res.json({ success: true, message: 'Password updated' });
+    } catch (err: any) {
+      console.error('Change password error:', err);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  // --- WEBAUTHN ROUTES ---
+  
+  const getOrigin = (req: express.Request) => `${req.protocol}://${req.get('host')}`;
+  // For WebAuthn, RP ID is typically just the domain name, no ports or protocol
+  const getRPID = (req: express.Request) => req.get('host')?.split(':')[0] || 'localhost';
+  const rpName = 'Haramaya University AMS';
+
+  app.get('/api/auth/webauthn/generate-registration-options', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ error: 'Unauthorized' });
+
+    try {
+      const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET) as any;
+      const { data: user, error } = await supabaseAdmin.from('users').select('*').eq('id', decoded.userId).single();
+      
+      if (error || !user) return res.status(404).json({ error: 'User not found' });
+
+      // We need user's existing credentials to prevent re-registration
+      const userWebauthnCredentials = user.webauthn_credentials || [];
+
+      const options = await generateRegistrationOptions({
+        rpName,
+        rpID: getRPID(req),
+        userID: Buffer.from(user.id, 'utf-8'),
+        userName: user.username,
+        userDisplayName: user.full_name,
+        attestationType: 'none',
+        excludeCredentials: userWebauthnCredentials.map((cred: any) => ({
+          id: Buffer.from(cred.id, 'base64'),
+          type: 'public-key',
+        })),
+        authenticatorSelection: {
+          residentKey: 'preferred',
+          userVerification: 'preferred',
+        },
+      });
+
+      // Save challenge to db
+      await supabaseAdmin.from('users').update({ webauthn_current_challenge: options.challenge }).eq('id', user.id);
+
+      res.json(options);
+    } catch (err: any) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/auth/webauthn/verify-registration', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ error: 'Unauthorized' });
+
+    try {
+      const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET) as any;
+      const { data: user } = await supabaseAdmin.from('users').select('*').eq('id', decoded.userId).single();
+
+      if (!user) return res.status(404).json({ error: 'User not found' });
+
+      const expectedChallenge = user.webauthn_current_challenge;
+
+      const verification = await verifyRegistrationResponse({
+        response: req.body,
+        expectedChallenge,
+        expectedOrigin: getOrigin(req),
+        expectedRPID: getRPID(req),
+      });
+
+      if (verification.verified && verification.registrationInfo) {
+        const { credentialPublicKey, credentialID, counter } = verification.registrationInfo;
+
+        const newCredential = {
+          id: Buffer.from(credentialID).toString('base64'),
+          publicKey: Buffer.from(credentialPublicKey).toString('base64'),
+          counter,
+          transports: req.body.response.transports || [],
+        };
+
+        const currentCreds = user.webauthn_credentials || [];
+        await supabaseAdmin.from('users').update({
+          webauthn_credentials: [...currentCreds, newCredential],
+          webauthn_current_challenge: null
+        }).eq('id', user.id);
+
+        res.json({ verified: true });
+      } else {
+        res.status(400).json({ error: 'Verification failed' });
+      }
+    } catch (err: any) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/auth/webauthn/generate-authentication-options', async (req, res) => {
+    try {
+      const { username } = req.body;
+      if (!username) return res.status(400).json({ error: 'Username required' });
+
+      const { data: user } = await supabaseAdmin.from('users').select('*').ilike('username', username).single();
+      if (!user) return res.status(404).json({ error: 'User not found' });
+
+      const credentials = user.webauthn_credentials || [];
+
+      const options = await generateAuthenticationOptions({
+        rpID: getRPID(req),
+        allowCredentials: credentials.map((cred: any) => ({
+          id: Buffer.from(cred.id, 'base64'),
+          type: 'public-key',
+          transports: cred.transports,
+        })),
+        userVerification: 'preferred',
+      });
+
+      await supabaseAdmin.from('users').update({ webauthn_current_challenge: options.challenge }).eq('id', user.id);
+
+      res.json(options);
+    } catch (err: any) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/auth/webauthn/verify-authentication', async (req, res) => {
+    try {
+      const { username, response } = req.body;
+      const { data: user } = await supabaseAdmin.from('users').select('*').ilike('username', username).single();
+      
+      if (!user) return res.status(404).json({ error: 'User not found' });
+
+      const credentials = user.webauthn_credentials || [];
+      const credIdBase64 = response.id;
+      const credential = credentials.find((c: any) => c.id === credIdBase64);
+
+      if (!credential) return res.status(400).json({ error: 'Authenticator is not registered with this site' });
+
+      const verification = await verifyAuthenticationResponse({
+        response,
+        expectedChallenge: user.webauthn_current_challenge,
+        expectedOrigin: getOrigin(req),
+        expectedRPID: getRPID(req),
+        authenticator: {
+          credentialID: Buffer.from(credential.id, 'base64'),
+          credentialPublicKey: Buffer.from(credential.publicKey, 'base64'),
+          counter: credential.counter,
+        },
+      });
+
+      if (verification.verified) {
+        // Update counter
+        const updatedCredentials = credentials.map((c: any) => 
+          c.id === credential.id ? { ...c, counter: verification.authenticationInfo.newCounter } : c
+        );
+
+        await supabaseAdmin.from('users').update({
+          webauthn_credentials: updatedCredentials,
+          webauthn_current_challenge: null
+        }).eq('id', user.id);
+
+        const token = jwt.sign(
+          { userId: user.id, username: user.username, role: user.role },
+          JWT_SECRET,
+          { expiresIn: '7d' }
+        );
+
+        const { password_hash, ...userResult } = user;
+        
+        res.json({
+          verified: true,
+          token,
+          user: {
+            userId: userResult.id,
+            username: userResult.username,
+            email: userResult.username,
+            role: userResult.role.toLowerCase(),
+            fullName: userResult.full_name,
+            createdAt: userResult.created_at,
+            department: 'Computer Science'
+          }
+        });
+      } else {
+        res.status(400).json({ error: 'Verification failed' });
+      }
+    } catch (err: any) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
     }
   });
 
@@ -804,6 +1042,23 @@ app.post('/api/auth/login', async (req, res) => {
     }
   });
 
+  app.put('/api/users/:id/reset-password', async (req, res) => {
+    try {
+      const defaultPassword = 'password123';
+      const hashedNewPassword = await bcrypt.hash(defaultPassword, 10);
+      const { error } = await supabaseAdmin
+        .from('users')
+        .update({ password_hash: hashedNewPassword })
+        .eq('id', req.params.id);
+
+      if (error) throw error;
+      res.json({ success: true, message: 'Password reset to default (password123)' });
+    } catch (err: any) {
+      console.error('Reset password error:', err);
+      res.status(500).json({ success: false, message: 'Failed to reset password' });
+    }
+  });
+
   app.delete('/api/users/:id', async (req, res) => {
     try {
       const { error } = await supabaseAdmin.from('users').delete().eq('id', req.params.id);
@@ -1033,12 +1288,9 @@ app.post('/api/auth/login', async (req, res) => {
         .limit(20);
         
       if (error) {
-        // Handle gracefully if table doesn't exist
-        if (error.code === '42P01') {
-          console.warn('Notifications table not found. Returning empty list.');
-          return res.json([]);
-        }
-        throw error;
+        console.warn('Notifications DB error:', error);
+        // Handle gracefully for any DB error (table missing, type error, etc.)
+        return res.json([]);
       }
       
       res.json(data.map((n: any) => ({

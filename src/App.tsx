@@ -9,6 +9,7 @@ import InstructorDashboard from './InstructorDashboard';
 import AdminDashboard from './AdminDashboard';
 import QAOfficerDashboard from './QAOfficerDashboard';
 import Profile from './Profile';
+import Settings from './Settings';
 import Landing from './pages/Landing';
 import DocumentationLayout from './pages/Docs/DocsLayout';
 import SystemDocumentation from './pages/Docs/SystemDocumentation';
@@ -122,7 +123,10 @@ export default function App() {
               <Route path="/admin/sections" element={<ProtectedRoute><Layout><AdminDashboard view="sections" /></Layout></ProtectedRoute>} />
               <Route path="/admin/semesters" element={<ProtectedRoute><Layout><AdminDashboard view="semesters" /></Layout></ProtectedRoute>} />
               <Route path="/admin/audit" element={<ProtectedRoute><Layout><AdminDashboard view="audit" /></Layout></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><Layout><AdminDashboard view="settings" /></Layout></ProtectedRoute>} />
+              <Route path="/admin/settings" element={<ProtectedRoute><Layout><AdminDashboard view="settings" /></Layout></ProtectedRoute>} />
+              
+              {/* Common Routes */}
+              <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
               
               {/* Instructor Routes */}
               <Route path="/instructor/sessions" element={<ProtectedRoute><Layout><InstructorDashboard view="sessions" /></Layout></ProtectedRoute>} />

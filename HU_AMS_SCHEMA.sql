@@ -75,6 +75,8 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL,
     role user_role NOT NULL,
     full_name TEXT NOT NULL,
+    webauthn_credentials JSONB DEFAULT '[]'::JSONB,
+    webauthn_current_challenge TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

@@ -29,7 +29,7 @@ export const menuItems = [
   { name: 'Programs', path: '/admin/programs', icon: Layers, roles: ['admin'] },
   { name: 'Batches', path: '/admin/batches', icon: Users, roles: ['admin'] },
   { name: 'Centers', path: '/admin/centers', icon: MapPin, roles: ['admin'] },
-  { name: 'Settings', path: '/settings', icon: Settings, roles: ['admin'] },
+  { name: 'System Config', path: '/admin/settings', icon: Settings, roles: ['admin'] },
   // Instructor
   { name: 'Live Sessions', path: '/instructor/sessions', icon: Play, roles: ['instructor'] },
   { name: 'My Sections', path: '/instructor/sections', icon: CalendarDays, roles: ['instructor'] },
@@ -43,6 +43,7 @@ export const menuItems = [
   { name: 'My Attendance', path: '/student/attendance', icon: CheckCircle2, roles: ['student'] },
   { name: 'Schedule', path: '/student/schedule', icon: Calendar, roles: ['student'] },
   // Common
+  { name: 'Settings', path: '/settings', icon: Settings, roles: ['student', 'instructor', 'admin', 'qa'] },
   { name: 'Profile', path: '/profile', icon: UserCircle, roles: ['student', 'instructor', 'admin', 'qa'] },
   { name: 'Documentation', path: '/docs', icon: BookOpen, roles: ['student', 'instructor', 'admin', 'qa'] },
 ];

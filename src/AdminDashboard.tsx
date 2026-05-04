@@ -28,7 +28,8 @@ import {
   Calendar,
   Lock,
   FileText,
-  Layers
+  Layers,
+  KeyRound
 } from 'lucide-react';
 import Papa from 'papaparse';
 import AnalyticsCard from './components/AnalyticsCard';
@@ -365,6 +366,40 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
           });
         }
         setIsConfirmModalOpen(false);
+      }
+    });
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleResetPassword = (userId: string) => {
+    setConfirmConfig({
+      title: 'Reset Password',
+      message: 'Are you sure you want to reset this user\'s password to the default? The default password is "password123".',
+      type: 'warning',
+      confirmText: 'Reset Password',
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/users/${userId}/reset-password`, { method: 'PUT' });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'Failed to reset password');
+          toast?.success('Password reset to password123 successfully');
+          
+          const userToReset = users.find(u => u.userId === userId);
+          if (userToReset) {
+            addAuditLog({
+              action: 'UPDATE',
+              entityType: 'USER',
+              entityId: userId,
+              entityName: userToReset.fullName,
+              performedBy: currentUser?.fullName || 'Admin',
+              details: `Reset password for user ${userToReset.username}`
+            });
+          }
+        } catch (err: any) {
+          toast?.error(err.message || 'Failed to reset password');
+        } finally {
+          setIsConfirmModalOpen(false);
+        }
       }
     });
     setIsConfirmModalOpen(true);
@@ -1169,18 +1204,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
                       <td className="px-8 py-6 whitespace-nowrap">
                         <div className="flex items-center gap-4">
                           <button 
+                            onClick={() => handleResetPassword(u.userId)}
+                            className="p-2 text-gray-300 hover:text-hu-gold transition-colors"
+                            title="Reset Password"
+                          >
+                            <KeyRound className="w-4 h-4" />
+                          </button>
+                          <button 
                             onClick={() => {
                               setEditingUser(u);
                               setUserForm(u);
                               setIsUserModalOpen(true);
                             }}
                             className="p-2 text-gray-300 hover:text-hu-gold transition-colors"
+                            title="Edit User"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button 
                             onClick={() => handleDeleteUser(u.userId)}
                             className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+                            title="Delete User"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

@@ -29,6 +29,10 @@ ALTER TABLE sections ADD COLUMN IF NOT EXISTS batch_id UUID REFERENCES batches(i
 -- 6. Add metadata to sessions
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS metadata JSONB;
 
+-- 6.5 Add WebAuthn to users
+ALTER TABLE users ADD COLUMN IF NOT EXISTS webauthn_credentials JSONB DEFAULT '[]'::JSONB;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS webauthn_current_challenge TEXT;
+
 -- 7. Add Notifications Table
 CREATE TABLE IF NOT EXISTS notifications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
