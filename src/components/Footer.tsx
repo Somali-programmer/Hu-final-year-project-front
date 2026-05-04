@@ -7,8 +7,10 @@ const Footer: React.FC = () => {
     <footer className="w-full bg-white dark:bg-brand-surface border-t border-brand-border py-12 px-6 md:px-12 mt-20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
         <div className="space-y-4 col-span-1 sm:col-span-2 lg:col-span-2">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-primary rounded-lg flex items-center justify-center text-white font-serif font-bold text-lg">H</div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-brand-border overflow-hidden shadow-sm">
+              <img src="https://somali-programmer.github.io/2018_exit_exam-/header-logo.png" alt="HU Logo" className="w-7 h-7 object-contain" />
+            </div>
             <h3 className="font-serif font-bold text-xl text-brand-text">HU-AMS Haramaya </h3>
           </div>
           <p className="text-sm text-gray-500 max-w-sm leading-relaxed">

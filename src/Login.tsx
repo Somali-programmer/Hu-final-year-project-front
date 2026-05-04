@@ -116,6 +116,7 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-brand-bg p-4 relative overflow-hidden transition-colors duration-500">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[url('https://somali-programmer.github.io/2018_exit_exam-/universty-image.avif')] bg-cover bg-center opacity-10 dark:opacity-5 transform scale-110" />
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-primary/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-primary/5 rounded-full blur-[120px]" />
       </div>
@@ -124,11 +125,11 @@ const Login: React.FC = () => {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-md w-full bg-brand-surface rounded-[48px] shadow-2xl p-8 md:p-12 text-center border border-brand-border relative z-10"
+        className="max-w-md w-full bg-brand-surface/90 backdrop-blur-md rounded-[48px] shadow-2xl p-8 md:p-12 text-center border border-brand-border relative z-10"
       >
         <div className="mb-10">
-          <div className="w-20 h-20 bg-brand-primary rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-brand-primary/30 transform hover:rotate-6 transition-transform duration-500">
-            <ShieldCheck className="text-brand-text dark:text-hu-charcoal w-10 h-10" />
+          <div className="w-24 h-24 bg-white rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-brand-primary/10 transform hover:rotate-6 transition-transform duration-500 overflow-hidden border border-brand-border">
+            <img src="https://somali-programmer.github.io/2018_exit_exam-/header-logo.png" alt="HU Logo" className="w-16 h-16 object-contain drop-shadow-md" />
           </div>
           <h1 className="text-3xl font-serif font-bold text-brand-text mb-2 tracking-tight transition-colors">
             HU <span className="text-brand-primary italic">Attendance</span>

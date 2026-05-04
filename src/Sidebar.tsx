@@ -21,8 +21,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     <aside className="w-72 bg-brand-surface border-r border-brand-border flex flex-col h-screen sticky top-0 transition-all duration-500">
       <div className="p-5 md:p-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-brand-primary rounded-2xl flex items-center justify-center text-brand-text dark:text-hu-charcoal shadow-xl shadow-brand-primary/20 transition-all duration-500">
-            <ShieldCheck className="w-7 h-7" />
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl shadow-brand-primary/10 transition-all duration-500 border border-brand-border overflow-hidden">
+            <img src="https://somali-programmer.github.io/2018_exit_exam-/header-logo.png" alt="HU Logo" className="w-7 h-7 object-contain" />
           </div>
           <div className="flex flex-col">
             <span className="font-serif font-bold text-2xl tracking-tight text-brand-text leading-none transition-colors">HU-AMS</span>

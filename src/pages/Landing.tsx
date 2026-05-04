@@ -24,7 +24,7 @@ const Header = ({ onLoginClick }: { onLoginClick: (e: React.MouseEvent) => void 
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-brand-border shadow-sm py-2' : 'bg-transparent py-4'}`}>
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="https://somali-programmer.github.io/2018_exit_exam-/logo.png" alt="HU Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain drop-shadow-sm" />
+          <img src="https://somali-programmer.github.io/2018_exit_exam-/header-logo.png" alt="HU Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain drop-shadow-sm" />
           <div className="flex flex-col justify-center">
             <h1 className="font-serif font-bold text-brand-text leading-tight tracking-tight flex flex-col pt-0.5">
               <span className="text-[15px] sm:text-lg md:text-xl lg:text-2xl whitespace-nowrap">Haramaya University</span>
@@ -85,7 +85,7 @@ export default function Landing() {
       <section className="relative min-h-screen flex items-center pt-28 overflow-hidden">
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0 bg-brand-bg">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 dark:opacity-30 scale-105 transform hover:scale-100 transition-transform duration-[20s]"></div>
+          <div className="absolute inset-0 bg-[url('https://somali-programmer.github.io/2018_exit_exam-/universty-image.avif')] bg-cover bg-center opacity-40 dark:opacity-30 scale-105 transform hover:scale-100 transition-transform duration-[20s]"></div>
           
           <div className="absolute inset-0 bg-brand-bg/60 backdrop-blur-[2px] dark:bg-brand-bg/70 dark:backdrop-blur-[1px]"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-bg/40 to-brand-bg"></div>
@@ -202,7 +202,7 @@ export default function Landing() {
             
             <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative h-[600px] rounded-[3rem] overflow-hidden hu-glass p-3 shadow-2xl">
               <div className="absolute inset-0 bg-brand-primary/5 rounded-[3rem] border border-brand-border m-3 pointer-events-none z-10"></div>
-              <img src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80" alt="Haramaya University" className="w-full h-full object-cover rounded-[2.5rem] opacity-90 transition-transform duration-[10s] hover:scale-105" />
+              <img src="https://somali-programmer.github.io/2018_exit_exam-/universty-image.avif" alt="Haramaya University" className="w-full h-full object-cover rounded-[2.5rem] opacity-90 transition-transform duration-[10s] hover:scale-105" />
             </motion.div>
           </div>
         </div>
@@ -293,7 +293,7 @@ export default function Landing() {
 
       {/* FOOTER CTA */}
       <section className="py-32 bg-brand-primary text-black text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2000&auto=format&fit=crop')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-[url('https://somali-programmer.github.io/2018_exit_exam-/preview.png')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={sectionVariants} className="max-w-4xl mx-auto px-4 relative z-10">
           <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-[5.5rem] font-sans font-bold tracking-tight mb-10 leading-[1.05]">Ready to manage attendance intelligently?</h2>
