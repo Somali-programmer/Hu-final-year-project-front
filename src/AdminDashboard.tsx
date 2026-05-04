@@ -392,7 +392,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ view = 'overview' }) =>
               entityId: userId,
               entityName: userToReset.fullName,
               performedBy: currentUser?.fullName || 'Admin',
-              details: `Reset password for user ${userToReset.username}`
+              details: `Reset password for user ${userToReset.email}`
             });
           }
         } catch (err: any) {

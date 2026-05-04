@@ -87,7 +87,8 @@ const Settings: React.FC = () => {
       });
 
       if (!verifyRes.ok) {
-        throw new Error('Failed to verify biometric registration');
+        const errorData = await verifyRes.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to verify biometric registration');
       }
 
       setBioStatus('success');

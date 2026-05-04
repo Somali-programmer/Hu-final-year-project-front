@@ -27,6 +27,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
+app.set('trust proxy', true);
 app.use(express.json());
 
 // Middleware
@@ -297,16 +298,22 @@ app.post('/api/auth/login', async (req, res) => {
       if (!user) return res.status(404).json({ error: 'User not found' });
 
       const expectedChallenge = user.webauthn_current_challenge;
+      const origin = getOrigin(req);
+      const rpID = getRPID(req);
+
+      console.log(`[WebAuthn Registration] Verifying for user: ${user.username}`);
+      console.log(`[WebAuthn Registration] Expected Origin: ${origin}`);
+      console.log(`[WebAuthn Registration] Expected RPID: ${rpID}`);
 
       const verification = await verifyRegistrationResponse({
         response: req.body,
         expectedChallenge,
-        expectedOrigin: getOrigin(req),
-        expectedRPID: getRPID(req),
+        expectedOrigin: origin,
+        expectedRPID: rpID,
       });
 
       if (verification.verified && verification.registrationInfo) {
-        const { credentialPublicKey, credentialID, counter } = verification.registrationInfo;
+        const { credentialPublicKey, credentialID, counter } = verification.registrationInfo as any;
 
         const newCredential = {
           id: Buffer.from(credentialID).toString('base64'),
@@ -321,12 +328,14 @@ app.post('/api/auth/login', async (req, res) => {
           webauthn_current_challenge: null
         }).eq('id', user.id);
 
+        console.log(`[WebAuthn Registration] Successfully registered biometric for ${user.username}`);
         res.json({ verified: true });
       } else {
-        res.status(400).json({ error: 'Verification failed' });
+        console.warn(`[WebAuthn Registration] Verification failed for ${user.username}`);
+        res.status(400).json({ error: 'Verification failed. Possibly origin or RPID mismatch.' });
       }
     } catch (err: any) {
-      console.error(err);
+      console.error(`[WebAuthn Registration Error]`, err);
       res.status(500).json({ error: err.message });
     }
   });
@@ -341,8 +350,11 @@ app.post('/api/auth/login', async (req, res) => {
 
       const credentials = user.webauthn_credentials || [];
 
+      const rpID = getRPID(req);
+      console.log(`[WebAuthn Login] Generating options for ${username} with RPID: ${rpID}`);
+
       const options = await generateAuthenticationOptions({
-        rpID: getRPID(req),
+        rpID,
         allowCredentials: credentials.map((cred: any) => ({
           id: Buffer.from(cred.id, 'base64'),
           type: 'public-key',
@@ -355,7 +367,7 @@ app.post('/api/auth/login', async (req, res) => {
 
       res.json(options);
     } catch (err: any) {
-      console.error(err);
+      console.error(`[WebAuthn Login Options Error]`, err);
       res.status(500).json({ error: err.message });
     }
   });
@@ -373,17 +385,24 @@ app.post('/api/auth/login', async (req, res) => {
 
       if (!credential) return res.status(400).json({ error: 'Authenticator is not registered with this site' });
 
+      const origin = getOrigin(req);
+      const rpID = getRPID(req);
+
+      console.log(`[WebAuthn Login] Verifying for user: ${user.username}`);
+      console.log(`[WebAuthn Login] Expected Origin: ${origin}`);
+      console.log(`[WebAuthn Login] Expected RPID: ${rpID}`);
+
       const verification = await verifyAuthenticationResponse({
         response,
         expectedChallenge: user.webauthn_current_challenge,
-        expectedOrigin: getOrigin(req),
-        expectedRPID: getRPID(req),
+        expectedOrigin: origin,
+        expectedRPID: rpID,
         authenticator: {
           credentialID: Buffer.from(credential.id, 'base64'),
           credentialPublicKey: Buffer.from(credential.publicKey, 'base64'),
           counter: credential.counter,
         },
-      });
+      } as any);
 
       if (verification.verified) {
         // Update counter
